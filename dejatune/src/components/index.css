@@ -1,69 +1,431 @@
 @import "tailwindcss";
+/* Theme Vars (PS5-style) */
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --bg-color: #F2F2F2;
+  --surface: #FFFFFF;
+  --text-primary: #1C1C1E;
+  --text-secondary: #6E6E73;
+  --accent: #0070D1;
+  --accent-hover: #005BB5;
+  --border: #D0D0D0;
+  --input-bg: #FFFFFF;
+  --quote-text: #000000; /* Added specific variable for quote text */
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
+/* Layout */
 body {
   margin: 0;
+  background: var(--bg-color);
+  color: var(--text-primary);
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+.app-container {
   display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* Left Sidebar */
+.left-sidebar {
+  width: 240px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
 }
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+.left-sidebar h2 {
+  margin: 0 0 0.5rem;
+  color: var(--accent);
+}
+.recent-list {
+  flex: 1;
+  overflow-y: auto;
+}
+.recent-item {
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: background 0.2s, color 0.2s;
 }
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+.recent-item:hover {
+  background: var(--accent-hover);
+  color: #fff;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* Main Content */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 2rem;
+}
+
+/* Splash: Think-view */
+.think-view {
+  text-align: center;
+}
+.think-btn {
+  font-size: 2.5rem;
+  padding: 1.5rem 3rem;
+  border: none;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  transition: background 0.2s, transform 0.1s;
+}
+.think-btn:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+}
+.think-btn:active {
+  transform: translateY(0);
+}
+.dejatune-title {
+  margin-top: 1.5rem;
+  font-size: 2rem;
+  color: var(--text-secondary);
+}
+.logo-placeholder {
+  margin-top: 1rem;
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+}
+
+/* Form-view */
+.form-view {
+  width: 100%;
+  max-width: 600px;
+}
+.form-view section h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+}
+.form-view input[type="text"] {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--input-bg);
+  color: var(--text-primary); /* ensure text is dark */
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-view input[type="text"]::placeholder {
+  color: var(--text-secondary); /* lighter placeholder */
+}
+.form-view input[type="text"]:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,112,209,0.2);
+}
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.identify-btn {
+  width: 100%;
+  padding: 1rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+.identify-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.identify-btn:not(:disabled):hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+/* Chat Input (initial) */
+.initial-input {
+  display: flex;
+  margin-top: auto;
+  padding-top: 1rem;
+  width: 100%;
+  max-width: 600px;
+}
+.initial-input input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.initial-input input::placeholder {
+  color: var(--text-secondary);
+}
+.initial-input input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,112,209,0.2);
+}
+.initial-input button {
+  margin-left: 0.5rem;
+  padding: 0 1.5rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+.initial-input button:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+.initial-input button:active {
+  transform: translateY(0);
+}
+
+/* Chat bubbles & options */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 600px;
+}
+.chat-bubble {
+  max-width: 75%;
+  margin: 0.5rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  opacity: 0;
+  animation: fadeInUp 0.3s forwards;
+}
+.chat-bubble.user {
+  align-self: flex-end;
+  background: var(--accent);
+  color: #fff;
+}
+.chat-bubble.bot {
+  align-self: flex-start;
+  background: var(--surface);
+  color: var(--text-primary);
+}
+.options-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.option-btn {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 6px;
+  background: var(--input-bg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: background 0.2s, transform 0.1s;
+}
+.option-btn:hover {
+  background: var(--accent);
+  color: #fff;
+  transform: translateY(-1px);
+}
+.option-btn:active {
+  transform: translateY(0);
+}
+@keyframes fadeInUp {
+ from { opacity: 0; transform: translateY(10px); }
+ to { opacity: 1; transform: translateY(0); }
+}
+
+/* Feedback & Results */
+.error {
+  margin-top: 1rem;
+  color: #E11D48;
+  font-weight: 600;
+}
+.result-view {
+  display: flex;
+  padding: 2rem;
+  gap: 2rem;
+  background: var(--surface);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  max-width: 800px;
+}
+.cover-thumb {
+  width: 40%;
+  border-radius: 8px;
+  object-fit: cover;
+}
+.quote-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.result-song {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+.result-artist {
+  font-size: 1.25rem;
+  margin: 0.25rem 0;
+  color: var(--text-secondary);
+}
+.result-meta {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+.result-meta .album-name::after {
+  content: " • ";
+}
+.spotify-embed-wrapper {
+  margin: 1rem 0;
+}
+
+/* Lyrics Container - New styles for the lyrics section */
+.lyrics-container {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: rgba(255,255,255,0.2);
+  border-radius: 8px;
+  position: relative;
+  line-height: 1.6;
+  color: var(--quote-text) !important; /* Force black text for quotes */
+  font-style: italic;
+}
+
+.lyrics-container::before {
+  content: "";
+  position: absolute;
+  left: 0.5rem;
+  top: -0.5rem;
+  font-size: 2rem;
+  color: var(--quote-text);
+  opacity: 0.7;
+}
+
+.lyrics-container::after {
+  content: "";
+  position: absolute;
+  right: 0.5rem;
+  bottom: -1rem;
+  font-size: 2rem;
+  color: var(--quote-text);
+  opacity: 0.7;
+}
+
+/* Ensure bold/italic styling for matched phrases */
+.lyrics-container b i {
+  font-weight: bold;
+  font-style: italic;
+  color: var(--quote-text);
+}
+
+/* Accept/Reject */
+.accept-reject {
+  margin-top: auto;
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+.accept-reject button {
+  width: 80px;
+  height: 80px;
+  background: rgba(255,255,255,0.85);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+.accept-reject button:hover {
+  background: var(--accent-hover);
+  transform: scale(1.1);
+}
+
+/* Right Sidebar */
+.right-sidebar {
+  width: 160px;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.sign-out,
+.chat-deja {
+  padding: 0.75rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #000000;
+  transition: background 0.2s, transform 0.1s;
+}
+.sign-out {
+  background: #E11D48;
+}
+.sign-out:hover {
+  background: #c81e47;
+  transform: translateY(-1px);
+}
+.chat-deja {
+  background: var(--accent);
+  color: #fff;
+}
+.chat-deja:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+.photo-message {
+  max-width: 300px;
+}
+.song-photo-card {
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 8px;
+  background: white;
+  color: black;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.album-photo {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.photo-card-details {
+  padding: 12px;
+}
+.photo-card-details h3 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+}
+.photo-card-details p {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #666;
+}
+.verse-preview {
+  font-size: 14px;
+  line-height: 1.4;
+  max-height: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
