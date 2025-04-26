@@ -21,7 +21,7 @@ const App = () => {
         
         {/* Title Section */}
         <h1 className="text-5xl font-extrabold text-center mb-8 bg-clip-text text-transparent bg-black">
-          DejaTune
+        Déjà Tune
         </h1>
 
 
