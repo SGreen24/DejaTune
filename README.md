@@ -5,3 +5,4 @@
 - npm install react-router-dom
 - lucide-react
 - npm install firebase
+- npm install @google/generative-ai
