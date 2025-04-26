@@ -6,6 +6,8 @@ import './components/index.css';
 import App from './App';
 import SignUp from './components/Auth/Signup';
 import Login from './components/Auth/Login';
+import Guest from './components/Auth/Guest';
+import Home from './components/Home/Home';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -14,6 +16,8 @@ createRoot(document.getElementById('root')).render(
         <Route path="/" element={<App />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/guest" element={<Guest />} />
+        <Route path="/home" element={<Home />} />
       </Routes>
     </Router>
   </StrictMode>
