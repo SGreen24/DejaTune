@@ -8,6 +8,7 @@ import { auth, db } from "../../config/firebase";
 import Profile from "./Profile";
 import Think from "./Think";
 import Deja from "./Deja";
+import GenerateTunes from "./GenerateTunes";
 
 import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
 
@@ -25,6 +26,7 @@ const Home = () => {
   const [vibe, setVibe] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [showGenerate, setShowGenerate] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [conversation, setConversation] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState("");
@@ -301,7 +303,7 @@ ${history}
           timestamp: new Date().toISOString(),
           albumName: result.albumName,
           spotifyId: result.spotifyId,
-          albumImage: result.albumImage, // <— include cover URL
+          albumImage: result.albumImage,
         }),
       });
     }
@@ -312,6 +314,7 @@ ${history}
   const clearAll = () => {
     setShowForm(false);
     setShowChat(false);
+    setShowGenerate(false);
     setPhrases([""]);
     setGenre("");
     setYear("");
@@ -337,198 +340,207 @@ ${history}
   return (
     <div className="app-container flex">
       {/* Left Sidebar */}
-<aside className="left-sidebar p-4 bg-white text-black w-64">
-  {savedSongs.length > 0 && (
-    <>
-      <h2 className="text-lg font-bold mb-2">Accepted Thoughts</h2>
-      <div className="space-y-2">
-        {savedSongs.map((t, i) => (
-          <div
-            key={`saved-${i}`}
-            className="group flex items-center space-x-3 hover:bg-blue-700 px-2 py-1 rounded cursor-pointer"
-          >
-            {t.albumImage && (
-              <img
-                src={t.albumImage}
-                alt={`${t.song} cover`}
-                className="w-10 h-10 rounded-sm object-cover"
-              />
-            )}
-            <div className="flex-1 truncate">
-              <p className="text-sm font-medium truncate group-hover:text-white">
-                {t.song}
-              </p>
-              <p className="text-xs text-gray-600 truncate group-hover:text-white">
-                {t.artist}
-              </p>
+      <aside className="left-sidebar p-4 bg-white text-black w-64">
+        {savedSongs.length > 0 && (
+          <>
+            <h2 className="text-lg font-bold mb-2">Accepted Thoughts</h2>
+            <div className="space-y-2">
+              {savedSongs.map((t, i) => (
+                <div
+                  key={`saved-${i}`}
+                  className="group flex items-center space-x-3 hover:bg-blue-700 px-2 py-1 rounded cursor-pointer"
+                >
+                  {t.albumImage && (
+                    <img
+                      src={t.albumImage}
+                      alt={`${t.song} cover`}
+                      className="w-10 h-10 rounded-sm object-cover"
+                    />
+                  )}
+                  <div className="flex-1 truncate">
+                    <p className="text-sm font-medium truncate group-hover:text-white">
+                      {t.song}
+                    </p>
+                    <p className="text-xs text-gray-600 truncate group-hover:text-white">
+                      {t.artist}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
-        ))}
-      </div>
-      <hr className="border-gray-300 my-4" />
-    </>
-  )}
-
-  <h2 className="text-lg font-bold mb-2">Recent Searches</h2>
-  <div className="space-y-2">
-    {recentSongs.map((t, i) => (
-      <div
-        key={`recent-${i}`}
-        className="group flex items-center space-x-3 hover:bg-blue-700 px-2 py-1 rounded cursor-pointer"
-      >
-        {t.albumImage && (
-          <img
-            src={t.albumImage}
-            alt={`${t.song} cover`}
-            className="w-10 h-10 rounded-sm object-cover"
-          />
+            <hr className="border-gray-300 my-4" />
+          </>
         )}
-        <div className="flex-1 truncate">
-          <p className="text-sm font-medium truncate group-hover:text-white">
-            {t.song}
-          </p>
-          <p className="text-xs text-gray-600 truncate group-hover:text-white">
-            {t.artist}
-          </p>
-        </div>
-      </div>
-    ))}
-  </div>
-</aside>
 
-      
+        <h2 className="text-lg font-bold mb-2">Recent Searches</h2>
+        <div className="space-y-2">
+          {recentSongs.map((t, i) => (
+            <div
+              key={`recent-${i}`}
+              className="group flex items-center space-x-3 hover:bg-blue-700 px-2 py-1 rounded cursor-pointer"
+            >
+              {t.albumImage && (
+                <img
+                  src={t.albumImage}
+                  alt={`${t.song} cover`}
+                  className="w-10 h-10 rounded-sm object-cover"
+                />
+              )}
+              <div className="flex-1 truncate">
+                <p className="text-sm font-medium truncate group-hover:text-white">
+                  {t.song}
+                </p>
+                <p className="text-xs text-gray-600 truncate group-hover:text-white">
+                  {t.artist}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </aside>
 
       {/* Main Content */}
       <main className="main-content flex-1" style={{ backgroundColor: bgColor }}>
-        {!showForm && !showChat && !result && (
-          <div className="think-view">
-            <button className="think-btn" onClick={() => setShowForm(true)}>
-              Think!
-            </button>
-            <h2 className="dejatune-title">DéjáTune</h2>
-          </div>
-        )}
-
-        {showForm && !showChat && !result && (
-          <Think
-            phrases={phrases}
-            setPhrases={setPhrases}
-            genre={genre}
-            setGenre={setGenre}
-            year={year}
-            setYear={setYear}
-            tone={tone}
-            setTone={setTone}
-            vibe={vibe}
-            setVibe={setVibe}
-            identifySong={identifySong}
-            loading={loading}
-            error={error}
-          />
-        )}
-
-        {showChat && !result && (
-          <Deja
-            conversation={conversation}
-            currentQuestion={currentQuestion}
-            options={options}
-            inputValue={inputValue}
-            setInputValue={setInputValue}
-            handleSendInitial={handleSendInitial}
-            handleOption={handleOption}
-            loading={loading}
-            error={error}
-          />
-        )}
-
-        {result && (
-          <div className="result-view">
-            <img src={result.albumImage} alt="Album cover" className="cover-thumb" />
-            <div className="quote-panel">
-              <h1 className="result-song">{result.song}</h1>
-              <h2 className="result-artist">{result.artist}</h2>
-              <div className="result-meta">
-                <span>{result.albumName}</span>
-                <span>{result.releaseDate}</span>
+        {showGenerate ? (
+          <GenerateTunes onDone={() => setShowGenerate(false)} />
+        ) : (
+          <>
+            {!showForm && !showChat && !result && (
+              <div className="think-view">
+                <button className="think-btn" onClick={() => setShowForm(true)}>
+                  Think!
+                </button>
+                <h2 className="dejatune-title">DéjáTune</h2>
               </div>
-              {result.verse && (
-                <div
-                  className="lyrics-container"
-                  style={{
-                    margin: "1rem 0",
-                    padding: "1rem",
-                    backgroundColor: "rgba(255,255,255,0.1)",
-                    borderRadius: "8px",
-                    color: quoteTextColor,
-                    fontStyle: "italic",
-                    position: "relative",
-                    lineHeight: "1.6",
-                  }}
-                >
-                  <div
-                    style={{
-                      position: "absolute",
-                      left: "0.5rem",
-                      top: "-0.5rem",
-                      fontSize: "2rem",
-                      color: quoteTextColor,
-                      opacity: 0.7,
-                    }}
-                  >
-                    "
+            )}
+
+            {showForm && !showChat && !result && (
+              <Think
+                phrases={phrases}
+                setPhrases={setPhrases}
+                genre={genre}
+                setGenre={setGenre}
+                year={year}
+                setYear={setYear}
+                tone={tone}
+                setTone={setTone}
+                vibe={vibe}
+                setVibe={setVibe}
+                identifySong={identifySong}
+                loading={loading}
+                error={error}
+              />
+            )}
+
+            {showChat && !result && (
+              <Deja
+                conversation={conversation}
+                currentQuestion={currentQuestion}
+                options={options}
+                inputValue={inputValue}
+                setInputValue={setInputValue}
+                handleSendInitial={handleSendInitial}
+                handleOption={handleOption}
+                loading={loading}
+                error={error}
+              />
+            )}
+
+            {result && (
+              <div className="result-view">
+                <img
+                  src={result.albumImage}
+                  alt="Album cover"
+                  className="cover-thumb"
+                />
+                <div className="quote-panel">
+                  <h1 className="result-song">{result.song}</h1>
+                  <h2 className="result-artist">{result.artist}</h2>
+                  <div className="result-meta">
+                    <span>{result.albumName}</span>
+                    <span>{result.releaseDate}</span>
                   </div>
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: result.verse.replace(
-                        /\*\*(.*?)\*\*/g,
-                        "<b><i>$1</i></b>"
-                      ),
-                    }}
-                  />
-                  <div
-                    style={{
-                      position: "absolute",
-                      right: "0.5rem",
-                      bottom: "-1rem",
-                      fontSize: "2rem",
-                      color: quoteTextColor,
-                      opacity: 0.7,
-                    }}
-                  >
-                    "
+                  {result.verse && (
+                    <div
+                      className="lyrics-container"
+                      style={{
+                        margin: "1rem 0",
+                        padding: "1rem",
+                        backgroundColor: "rgba(255,255,255,0.1)",
+                        borderRadius: "8px",
+                        color: quoteTextColor,
+                        fontStyle: "italic",
+                        position: "relative",
+                        lineHeight: "1.6",
+                      }}
+                    >
+                      <div
+                        style={{
+                          position: "absolute",
+                          left: "0.5rem",
+                          top: "-0.5rem",
+                          fontSize: "2rem",
+                          color: quoteTextColor,
+                          opacity: 0.7,
+                        }}
+                      >
+                        "
+                      </div>
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: result.verse.replace(
+                            /\*\*(.*?)\*\*/g,
+                            "<b><i>$1</i></b>"
+                          ),
+                        }}
+                      />
+                      <div
+                        style={{
+                          position: "absolute",
+                          right: "0.5rem",
+                          bottom: "-1rem",
+                          fontSize: "2rem",
+                          color: quoteTextColor,
+                          opacity: 0.7,
+                        }}
+                      >
+                        "
+                      </div>
+                    </div>
+                  )}
+                  {result.spotifyId && (
+                    <iframe
+                      title="Spotify preview"
+                      src={`https://open.spotify.com/embed/track/${result.spotifyId}`}
+                      width="100%"
+                      height="80"
+                      frameBorder="0"
+                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                      loading="lazy"
+                    />
+                  )}
+                  <div className="accept-reject">
+                    <button onClick={onAccept}>
+                      <Check size={32} />
+                    </button>
+                    <button onClick={onReject}>
+                      <X size={32} />
+                    </button>
                   </div>
                 </div>
-              )}
-              {result.spotifyId && (
-                <iframe
-                  title="Spotify preview"
-                  src={`https://open.spotify.com/embed/track/${result.spotifyId}`}
-                  width="100%"
-                  height="80"
-                  frameBorder="0"
-                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                  loading="lazy"
-                />
-              )}
-              <div className="accept-reject">
-                <button onClick={onAccept}>
-                  <Check size={32} />
-                </button>
-                <button onClick={onReject}>
-                  <X size={32} />
-                </button>
               </div>
-            </div>
-          </div>
+            )}
+          </>
         )}
       </main>
 
       {/* Right Sidebar */}
       <aside className="right-sidebar flex flex-col items-end space-y-4 p-4">
         <Profile />
-        {!showChat ? (
+
+        {!showChat && !showGenerate && (
           <button
-            className="chat-deja"
+            className="chat-deja mb-2"
             onClick={() => {
               clearAll();
               setShowChat(true);
@@ -536,15 +548,35 @@ ${history}
           >
             Chat w/ Déjà
           </button>
-        ) : (
+        )}
+        {showChat && !showGenerate && (
           <button
-            className="chat-deja"
+            className="chat-deja mb-2"
             onClick={() => {
               clearAll();
               setShowForm(true);
             }}
           >
             Think w/ Form
+          </button>
+        )}
+
+        {!showGenerate ? (
+          <button
+            className="generate-tunes bg-purple-600 text-white px-4 py-2 rounded"
+            onClick={() => {
+              clearAll();
+              setShowGenerate(true);
+            }}
+          >
+            Generate Tunes
+          </button>
+        ) : (
+          <button
+            className="generate-tunes bg-gray-500 text-white px-4 py-2 rounded"
+            onClick={() => setShowGenerate(false)}
+          >
+            Close Generator
           </button>
         )}
       </aside>
