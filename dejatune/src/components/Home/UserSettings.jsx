@@ -119,36 +119,48 @@ const UserSettings = ({ user, onClose, onLogout }) => {
         });
     };
 
-    // Handle profile picture update
     const handleChangeProfilePicture = async (e) => {
         try {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            // Convert the file to base64
-            const base64Picture = await convertFileToBase64(file);
-
-            // Update the user's profile picture in Firestore
-            const userRef = doc(db, 'Users', user.uid);
-            await updateDoc(userRef, { profilePicture: base64Picture });
-
-             // Fetch the updated user data from Firestore
-            const updatedUserDoc = await getDoc(userRef);
-            if (updatedUserDoc.exists()) {
-                const updatedData = updatedUserDoc.data();
-                setProfilePicture(updatedData.profilePicture);  // Update local state with the new picture
-            }
-
-            setProfilePicture(base64Picture);
-            setSuccessMessage('Profile picture updated successfully.');
-
+          const file = e.target.files[0];
+          if (!file) return;
+      
+          // 🚫 File size check (500KB limit)
+          if (file.size > 500 * 1024) {
+            setErrorMessage("Please upload a smaller image (max 500KB).");
+            return;
+          }
+      
+          console.log('Uploading for user:', user);
+          console.log('Selected file:', file);
+      
+          const base64Picture = await convertFileToBase64(file);
+          console.log('Base64 length:', base64Picture.length);
+      
+          if (!user || !user.uid) {
+            console.error('User not valid:', user);
+            setErrorMessage('Invalid user session.');
+            return;
+          }
+      
+          const userRef = doc(db, 'Users', user.uid);
+          await updateDoc(userRef, { profilePicture: base64Picture });
+          console.log('Firestore updated successfully.');
+      
+          const updatedUserDoc = await getDoc(userRef);
+          if (updatedUserDoc.exists()) {
+            const updatedData = updatedUserDoc.data();
+            console.log('Updated user data:', updatedData);
+            setProfilePicture(updatedData.profilePicture);
+          }
+      
+          setProfilePicture(base64Picture);
+          setSuccessMessage('Profile picture updated successfully.');
         } catch (error) {
-            setErrorMessage('Error updating profile picture.');
-            console.error('Error updating profile picture:', error);
+          console.error('Error updating profile picture:', error);
+          setErrorMessage('Error updating profile picture.');
         }
-    };
-
-    
+      };
+      
 
     // Handle account deletion
     const handleDeleteAccount = async () => {
@@ -205,6 +217,7 @@ const UserSettings = ({ user, onClose, onLogout }) => {
             <button
                 className="w-full py-2 px-4 bg-yellow-500 text-white rounded-lg mb-2"
                 onClick={handleProfilePictureButtonClick}
+                
             >
                 Change Profile Picture
             </button>
