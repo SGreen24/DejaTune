@@ -301,6 +301,7 @@ ${history}
           timestamp: new Date().toISOString(),
           albumName: result.albumName,
           spotifyId: result.spotifyId,
+          albumImage: result.albumImage, // <— include cover URL
         }),
       });
     }
@@ -334,32 +335,71 @@ ${history}
   };
 
   return (
-    <div className="app-container">
-      <aside className="left-sidebar">
-        {savedSongs.length > 0 && (
-          <>
-            <h2>Accepted Thoughts</h2>
-            <div className="recent-list">
-              {savedSongs.map((t, i) => (
-                <div key={i} className="recent-item">
-                  {t.song} – {t.artist}
-                </div>
-              ))}
+    <div className="app-container flex">
+      {/* Left Sidebar */}
+<aside className="left-sidebar p-4 bg-white text-black w-64">
+  {savedSongs.length > 0 && (
+    <>
+      <h2 className="text-lg font-bold mb-2">Accepted Thoughts</h2>
+      <div className="space-y-2">
+        {savedSongs.map((t, i) => (
+          <div
+            key={`saved-${i}`}
+            className="group flex items-center space-x-3 hover:bg-blue-700 px-2 py-1 rounded cursor-pointer"
+          >
+            {t.albumImage && (
+              <img
+                src={t.albumImage}
+                alt={`${t.song} cover`}
+                className="w-10 h-10 rounded-sm object-cover"
+              />
+            )}
+            <div className="flex-1 truncate">
+              <p className="text-sm font-medium truncate group-hover:text-white">
+                {t.song}
+              </p>
+              <p className="text-xs text-gray-600 truncate group-hover:text-white">
+                {t.artist}
+              </p>
             </div>
-            <hr style={{ margin: "1rem 0", borderColor: "var(--border)" }} />
-          </>
-        )}
-        <h2>Recent Searches</h2>
-        <div className="recent-list">
-          {recentSongs.map((t, i) => (
-            <div key={i} className="recent-item">
-              {t.song} – {t.artist}
-            </div>
-          ))}
-        </div>
-      </aside>
+          </div>
+        ))}
+      </div>
+      <hr className="border-gray-300 my-4" />
+    </>
+  )}
 
-      <main className="main-content" style={{ backgroundColor: bgColor }}>
+  <h2 className="text-lg font-bold mb-2">Recent Searches</h2>
+  <div className="space-y-2">
+    {recentSongs.map((t, i) => (
+      <div
+        key={`recent-${i}`}
+        className="group flex items-center space-x-3 hover:bg-blue-700 px-2 py-1 rounded cursor-pointer"
+      >
+        {t.albumImage && (
+          <img
+            src={t.albumImage}
+            alt={`${t.song} cover`}
+            className="w-10 h-10 rounded-sm object-cover"
+          />
+        )}
+        <div className="flex-1 truncate">
+          <p className="text-sm font-medium truncate group-hover:text-white">
+            {t.song}
+          </p>
+          <p className="text-xs text-gray-600 truncate group-hover:text-white">
+            {t.artist}
+          </p>
+        </div>
+      </div>
+    ))}
+  </div>
+</aside>
+
+      
+
+      {/* Main Content */}
+      <main className="main-content flex-1" style={{ backgroundColor: bgColor }}>
         {!showForm && !showChat && !result && (
           <div className="think-view">
             <button className="think-btn" onClick={() => setShowForm(true)}>
@@ -412,18 +452,49 @@ ${history}
                 <span>{result.releaseDate}</span>
               </div>
               {result.verse && (
-                <div className="lyrics-container" style={{
-                  margin: "1rem 0", padding: "1rem", backgroundColor: "rgba(255,255,255,0.1)",
-                  borderRadius: "8px", color: quoteTextColor, fontStyle: "italic",
-                  position: "relative", lineHeight: "1.6",
-                }}>
-                  <div style={{ position: "absolute", left: "0.5rem", top: "-0.5rem", fontSize: "2rem", color: quoteTextColor, opacity: 0.7 }}>
+                <div
+                  className="lyrics-container"
+                  style={{
+                    margin: "1rem 0",
+                    padding: "1rem",
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                    borderRadius: "8px",
+                    color: quoteTextColor,
+                    fontStyle: "italic",
+                    position: "relative",
+                    lineHeight: "1.6",
+                  }}
+                >
+                  <div
+                    style={{
+                      position: "absolute",
+                      left: "0.5rem",
+                      top: "-0.5rem",
+                      fontSize: "2rem",
+                      color: quoteTextColor,
+                      opacity: 0.7,
+                    }}
+                  >
                     "
                   </div>
-                  <div dangerouslySetInnerHTML={{
-                    __html: result.verse.replace(/\*\*(.*?)\*\*/g, "<b><i>$1</i></b>")
-                  }} />
-                  <div style={{ position: "absolute", right: "0.5rem", bottom: "-1rem", fontSize: "2rem", color: quoteTextColor, opacity: 0.7 }}>
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: result.verse.replace(
+                        /\*\*(.*?)\*\*/g,
+                        "<b><i>$1</i></b>"
+                      ),
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: "absolute",
+                      right: "0.5rem",
+                      bottom: "-1rem",
+                      fontSize: "2rem",
+                      color: quoteTextColor,
+                      opacity: 0.7,
+                    }}
+                  >
                     "
                   </div>
                 </div>
@@ -432,28 +503,47 @@ ${history}
                 <iframe
                   title="Spotify preview"
                   src={`https://open.spotify.com/embed/track/${result.spotifyId}`}
-                  width="100%" height="80" frameBorder="0"
+                  width="100%"
+                  height="80"
+                  frameBorder="0"
                   allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                   loading="lazy"
                 />
               )}
               <div className="accept-reject">
-                <button onClick={onAccept}><Check size={32} /></button>
-                <button onClick={onReject}><X size={32} /></button>
+                <button onClick={onAccept}>
+                  <Check size={32} />
+                </button>
+                <button onClick={onReject}>
+                  <X size={32} />
+                </button>
               </div>
             </div>
           </div>
         )}
       </main>
 
+      {/* Right Sidebar */}
       <aside className="right-sidebar flex flex-col items-end space-y-4 p-4">
-        <div className="mb-4"><Profile /></div>
+        <Profile />
         {!showChat ? (
-          <button className="chat-deja" onClick={() => { clearAll(); setShowChat(true); }}>
+          <button
+            className="chat-deja"
+            onClick={() => {
+              clearAll();
+              setShowChat(true);
+            }}
+          >
             Chat w/ Déjà
           </button>
         ) : (
-          <button className="chat-deja" onClick={() => { clearAll(); setShowForm(true); }}>
+          <button
+            className="chat-deja"
+            onClick={() => {
+              clearAll();
+              setShowForm(true);
+            }}
+          >
             Think w/ Form
           </button>
         )}
