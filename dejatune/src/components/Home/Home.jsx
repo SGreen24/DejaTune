@@ -6,6 +6,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Check, X } from "lucide-react";
 import { auth, db } from "../../config/firebase";
 import Profile from "./Profile";
+import Think from "./Think";
+import Deja from "./Deja";
 
 import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
 
@@ -36,7 +38,7 @@ const Home = () => {
   const [quoteTextColor, setQuoteTextColor] = useState("#000");
 
   // Gemini + Spotify setup
-  const apiKey = "AIzaSyCh75P7FsxwekKc8XoXvnVm62hrBKyplQQ"; // this is our Gemini API info for now, gonna learn how to dotenv this to keep it concealed!
+  const apiKey = "AIzaSyCh75P7FsxwekKc8XoXvnVm62hrBKyplQQ";
   const [spotifyClientId] = useState("ffbb278d0ef74b07887f0643f073a745");
   const [spotifyClientSecret] = useState("64f2d31922fb401eab8325c800637ab7");
   const ai = new GoogleGenerativeAI(apiKey);
@@ -45,8 +47,7 @@ const Home = () => {
   // Listen for auth state
   useEffect(() => {
     const unsub = auth.onAuthStateChanged((u) => {
-      if (!u)
-        navigate("/"); // not logged in → back to login
+      if (!u) navigate("/");
       else setUser(u);
     });
     return unsub;
@@ -71,7 +72,7 @@ const Home = () => {
     };
   }, [user]);
 
-  // ─── FORM FEATURE ───
+  // Form prompt builder
   const buildFormPrompt = () =>
     `
 You're a powerful music memory assistant.
@@ -110,25 +111,25 @@ ${vibe ? `Vibe: ${vibe}` : ""}
         if (!songM || !artM || !vM) continue;
 
         const song = songM[1].trim();
-        const art = artM[1].trim();
+        const artist = artM[1].trim();
         const verse = vM[1].trim();
 
         if (
           phrases.some((p) => verse.toLowerCase().includes(p.toLowerCase()))
         ) {
-          // bold user fragments
           const bolded = phrases.reduce(
             (acc, ph) =>
-              ph ? acc.replace(new RegExp(`(${ph})`, "gi"), "**$1**") : acc,
-            verse,
+              ph
+                ? acc.replace(new RegExp(`(${ph})`, "gi"), "**$1**")
+                : acc,
+            verse
           );
-          const details = await fetchSpotifyDetails(song, art);
-          found = { song, artist: art, verse: bolded, ...details };
+          const details = await fetchSpotifyDetails(song, artist);
+          found = { song, artist, verse: bolded, ...details };
         }
       }
       if (!found) throw new Error("Couldn't match any lyrics after 10 tries.");
 
-      // 💾 Save to RecentSongs
       if (user) {
         const recentRef = doc(db, "RecentSongs", user.uid);
         await updateDoc(recentRef, {
@@ -139,7 +140,6 @@ ${vibe ? `Vibe: ${vibe}` : ""}
           }),
         });
       }
-
       setResult(found);
     } catch (e) {
       setError(e.message);
@@ -148,7 +148,7 @@ ${vibe ? `Vibe: ${vibe}` : ""}
     }
   };
 
-  // ─── CHAT FEATURE ───
+  // Chat feature
   const askClarifyingQuestion = async () => {
     setLoading(true);
     setError(null);
@@ -175,16 +175,14 @@ ${history}
       raw = raw.replace(/```json|```/g, "").trim();
       const obj = JSON.parse(raw);
 
-      if (obj.type === "QUESTION" && !obj.ready) {
+      if (obj.type === "QUESTION") {
         setConversation((c) => [...c, { speaker: "bot", text: obj.question }]);
         setCurrentQuestion(obj.question);
         setOptions(obj.options);
-      } else if (obj.type === "QUESTION" && obj.ready) {
-        setIsFinalConfirm(true);
-        setPendingGuess({ song: obj.song, artist: obj.artist });
-        setConversation((c) => [...c, { speaker: "bot", text: obj.question }]);
-        setCurrentQuestion(obj.question);
-        setOptions(obj.options);
+        if (obj.ready) {
+          setIsFinalConfirm(true);
+          setPendingGuess({ song: obj.song, artist: obj.artist });
+        }
       } else {
         throw new Error("Unexpected JSON from Gemini");
       }
@@ -224,7 +222,7 @@ ${history}
     askClarifyingQuestion();
   };
 
-  // ─── SPOTIFY HELPERS ───
+  // Spotify helpers
   const fetchSpotifyToken = async () => {
     const creds = btoa(`${spotifyClientId}:${spotifyClientSecret}`);
     const res = await fetch("https://accounts.spotify.com/api/token", {
@@ -245,7 +243,7 @@ ${history}
     const q = encodeURIComponent(`track:${song} artist:${artist}`);
     const res = await fetch(
       `https://api.spotify.com/v1/search?q=${q}&type=track&limit=1`,
-      { headers: { Authorization: `Bearer ${token}` } },
+      { headers: { Authorization: `Bearer ${token}` } }
     );
     const { tracks } = await res.json();
     const track = tracks?.items?.[0];
@@ -255,9 +253,9 @@ ${history}
     if (artistId) {
       const artRes = await fetch(
         `https://api.spotify.com/v1/artists/${artistId}`,
-        { headers: { Authorization: `Bearer ${token}` } },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      genres = (await artRes.json()).genres?.join(", ") || "";
+      genres = (await artRes.json()).genres.join(", ") || "";
     }
     return {
       albumImage: track.album.images[0]?.url || "",
@@ -268,7 +266,7 @@ ${history}
     };
   };
 
-  // ─── DYNAMIC BG & TEXT COLOR ───
+  // Dynamic background based on album cover
   useEffect(() => {
     if (!result?.albumImage) return;
     const img = new Image();
@@ -281,26 +279,18 @@ ${history}
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
       const { data } = ctx.getImageData(0, 0, img.width, img.height);
-      let r = 0,
-        g = 0,
-        b = 0,
-        cnt = 0;
+      let r = 0, g = 0, b = 0, cnt = 0;
       for (let i = 0; i < data.length; i += 4) {
-        r += data[i];
-        g += data[i + 1];
-        b += data[i + 2];
-        cnt++;
+        r += data[i]; g += data[i+1]; b += data[i+2]; cnt++;
       }
-      r = Math.round(r / cnt);
-      g = Math.round(g / cnt);
-      b = Math.round(b / cnt);
+      r = Math.round(r / cnt); g = Math.round(g / cnt); b = Math.round(b / cnt);
       setBgColor(`rgb(${r},${g},${b})`);
-      const lum = (r * 299 + g * 587 + b * 114) / 1000;
+      const lum = (r*299 + g*587 + b*114)/1000;
       setQuoteTextColor(lum < 128 ? "#FFF" : "#000");
     };
   }, [result?.albumImage]);
 
-  // ─── ACCEPT / REJECT ───
+  // Accept / Reject
   const onAccept = async () => {
     if (user && result) {
       const savedRef = doc(db, "SavedSongs", user.uid);
@@ -316,10 +306,7 @@ ${history}
     }
     clearAll();
   };
-
-  const onReject = () => {
-    result ? clearAll() : handleOption("No");
-  };
+  const onReject = () => (result ? clearAll() : handleOption("No"));
 
   const clearAll = () => {
     setShowForm(false);
@@ -340,7 +327,7 @@ ${history}
     setQuoteTextColor("#000");
   };
 
-  // ─── SIGN OUT ───
+  // Sign out
   const handleSignOut = async () => {
     await auth.signOut();
     navigate("/");
@@ -348,7 +335,6 @@ ${history}
 
   return (
     <div className="app-container">
-      {/* ← Left Sidebar */}
       <aside className="left-sidebar">
         {savedSongs.length > 0 && (
           <>
@@ -373,9 +359,7 @@ ${history}
         </div>
       </aside>
 
-      {/* ↓ Center Panel */}
       <main className="main-content" style={{ backgroundColor: bgColor }}>
-        {/* SPLASH */}
         {!showForm && !showChat && !result && (
           <div className="think-view">
             <button className="think-btn" onClick={() => setShowForm(true)}>
@@ -385,119 +369,41 @@ ${history}
           </div>
         )}
 
-        {/* FORM FEATURE */}
         {showForm && !showChat && !result && (
-          <div className="form-view">
-            <section>
-              <h3>Lyric Fragments</h3>
-              {phrases.map((p, i) => (
-                <input
-                  key={i}
-                  type="text"
-                  value={p}
-                  onChange={(e) =>
-                    setPhrases((u) => {
-                      u[i] = e.target.value;
-                      return [...u];
-                    })
-                  }
-                  placeholder={`Fragment ${i + 1}`}
-                />
-              ))}
-              <button onClick={() => setPhrases((u) => [...u, ""])}>
-                + Add Fragment
-              </button>
-            </section>
-            <section>
-              <h3>Filters</h3>
-              <div className="filters-grid">
-                <input
-                  placeholder="Genre"
-                  value={genre}
-                  onChange={(e) => setGenre(e.target.value)}
-                />
-                <input
-                  placeholder="Year"
-                  value={year}
-                  onChange={(e) => setYear(e.target.value)}
-                />
-                <input
-                  placeholder="Mood"
-                  value={tone}
-                  onChange={(e) => setTone(e.target.value)}
-                />
-                <input
-                  placeholder="Vibe"
-                  value={vibe}
-                  onChange={(e) => setVibe(e.target.value)}
-                />
-              </div>
-            </section>
-            <button
-              className="identify-btn"
-              onClick={identifySong}
-              disabled={loading}
-            >
-              {loading ? "Identifying…" : "Identify Song"}
-            </button>
-            {error && <p className="error">{error}</p>}
-          </div>
+          <Think
+            phrases={phrases}
+            setPhrases={setPhrases}
+            genre={genre}
+            setGenre={setGenre}
+            year={year}
+            setYear={setYear}
+            tone={tone}
+            setTone={setTone}
+            vibe={vibe}
+            setVibe={setVibe}
+            identifySong={identifySong}
+            loading={loading}
+            error={error}
+          />
         )}
 
-        {/* CHAT FEATURE */}
         {showChat && !result && (
-          <div className="chat-container">
-            {conversation.map((m, i) => (
-              <div
-                key={i}
-                className={`chat-bubble ${m.speaker === "user" ? "user" : "bot"}`}
-              >
-                {m.text}
-              </div>
-            ))}
-            {currentQuestion && options.length > 0 && (
-              <div className="options-row">
-                {options.map((o) => (
-                  <button
-                    key={o}
-                    className="option-btn"
-                    onClick={() => handleOption(o)}
-                    disabled={loading}
-                  >
-                    {o}
-                  </button>
-                ))}
-              </div>
-            )}
-            {!currentQuestion && conversation.length === 0 && (
-              <div className="initial-input">
-                <input
-                  type="text"
-                  placeholder="What song are you thinking of?"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSendInitial()}
-                />
-                <button
-                  onClick={handleSendInitial}
-                  disabled={!inputValue.trim() || loading}
-                >
-                  Send
-                </button>
-              </div>
-            )}
-            {error && <p className="error">{error}</p>}
-          </div>
+          <Deja
+            conversation={conversation}
+            currentQuestion={currentQuestion}
+            options={options}
+            inputValue={inputValue}
+            setInputValue={setInputValue}
+            handleSendInitial={handleSendInitial}
+            handleOption={handleOption}
+            loading={loading}
+            error={error}
+          />
         )}
 
-        {/* RESULT VIEW */}
         {result && (
           <div className="result-view">
-            <img
-              src={result.albumImage}
-              alt="Album cover"
-              className="cover-thumb"
-            />
+            <img src={result.albumImage} alt="Album cover" className="cover-thumb" />
             <div className="quote-panel">
               <h1 className="result-song">{result.song}</h1>
               <h2 className="result-artist">{result.artist}</h2>
@@ -505,75 +411,35 @@ ${history}
                 <span>{result.albumName}</span>
                 <span>{result.releaseDate}</span>
               </div>
-
               {result.verse && (
-                <div
-                  className="lyrics-container"
-                  style={{
-                    margin: "1rem 0",
-                    padding: "1rem",
-                    backgroundColor: "rgba(255,255,255,0.1)",
-                    borderRadius: "8px",
-                    color: quoteTextColor,
-                    fontStyle: "italic",
-                    position: "relative",
-                    lineHeight: "1.6",
-                  }}
-                >
-                  <div
-                    style={{
-                      position: "absolute",
-                      left: "0.5rem",
-                      top: "-0.5rem",
-                      fontSize: "2rem",
-                      color: quoteTextColor,
-                      opacity: "0.7",
-                    }}
-                  >
+                <div className="lyrics-container" style={{
+                  margin: "1rem 0", padding: "1rem", backgroundColor: "rgba(255,255,255,0.1)",
+                  borderRadius: "8px", color: quoteTextColor, fontStyle: "italic",
+                  position: "relative", lineHeight: "1.6",
+                }}>
+                  <div style={{ position: "absolute", left: "0.5rem", top: "-0.5rem", fontSize: "2rem", color: quoteTextColor, opacity: 0.7 }}>
                     "
                   </div>
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: result.verse.replace(
-                        /\*\*(.*?)\*\*/g,
-                        "<b><i>$1</i></b>",
-                      ),
-                    }}
-                  />
-                  <div
-                    style={{
-                      position: "absolute",
-                      right: "0.5rem",
-                      bottom: "-1rem",
-                      fontSize: "2rem",
-                      color: quoteTextColor,
-                      opacity: "0.7",
-                    }}
-                  >
+                  <div dangerouslySetInnerHTML={{
+                    __html: result.verse.replace(/\*\*(.*?)\*\*/g, "<b><i>$1</i></b>")
+                  }} />
+                  <div style={{ position: "absolute", right: "0.5rem", bottom: "-1rem", fontSize: "2rem", color: quoteTextColor, opacity: 0.7 }}>
                     "
                   </div>
                 </div>
               )}
-
               {result.spotifyId && (
                 <iframe
                   title="Spotify preview"
                   src={`https://open.spotify.com/embed/track/${result.spotifyId}`}
-                  width="100%"
-                  height="80"
-                  frameBorder="0"
+                  width="100%" height="80" frameBorder="0"
                   allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                   loading="lazy"
                 />
               )}
-
               <div className="accept-reject">
-                <button onClick={onAccept}>
-                  <Check size={32} />
-                </button>
-                <button onClick={onReject}>
-                  <X size={32} />
-                </button>
+                <button onClick={onAccept}><Check size={32} /></button>
+                <button onClick={onReject}><X size={32} /></button>
               </div>
             </div>
           </div>
@@ -581,28 +447,13 @@ ${history}
       </main>
 
       <aside className="right-sidebar flex flex-col items-end space-y-4 p-4">
-        <div className="mb-4">
-          <Profile /> 
-        </div>
-
+        <div className="mb-4"><Profile /></div>
         {!showChat ? (
-          <button
-            className="chat-deja"
-            onClick={() => {
-              clearAll();
-              setShowChat(true);
-            }}
-          >
+          <button className="chat-deja" onClick={() => { clearAll(); setShowChat(true); }}>
             Chat w/ Déjà
           </button>
         ) : (
-          <button
-            className="chat-deja"
-            onClick={() => {
-              clearAll();
-              setShowForm(true);
-            }}
-          >
+          <button className="chat-deja" onClick={() => { clearAll(); setShowForm(true); }}>
             Think w/ Form
           </button>
         )}
