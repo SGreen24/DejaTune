@@ -1,4 +1,5 @@
-import { useState } from "react";
+// src/pages/SignUp.jsx
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, KeySquare } from "lucide-react";
 import { auth, db, provider } from "../../config/firebase";
@@ -7,25 +8,20 @@ import { doc, setDoc } from "firebase/firestore";
 
 const SignUp = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail]               = useState("");
+  const [password, setPassword]         = useState("");
   const [profilePicture, setProfilePicture] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading]       = useState(false);
 
-  const handleProfilePictureUpload = async () => {
-    if (!profilePicture) return null;
-    try {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(profilePicture);
-      });
-    } catch (error) {
-      console.error("Error uploading profile picture to base 64", error);
-      return null;
-    }
+  const handleProfilePictureUpload = () => {
+    if (!profilePicture) return Promise.resolve(null);
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(profilePicture);
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -34,54 +30,30 @@ const SignUp = () => {
     setErrorMessage("");
 
     try {
-      // Check image size first (max 500KB)
       if (profilePicture && profilePicture.size > 500 * 1024) {
         setErrorMessage("Please upload a smaller image (max 500KB).");
         setIsLoading(false);
-        return; // Stop signup if too big
+        return;
       }
 
-      // Create the user with email/password
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
-      const user = userCredential.user;
-
-      // Upload profile pic if any
+      const { user } = await createUserWithEmailAndPassword(auth, email, password);
       const profilePictureUrl = await handleProfilePictureUpload();
 
-      // Firestore: Users collection
-      const userRef = doc(db, "Users", user.uid);
-      await setDoc(userRef, {
+      await setDoc(doc(db, "Users", user.uid), {
         email: user.email,
-        profilePicture: profilePictureUrl || "",
+        profilePicture: profilePictureUrl || ""
       });
+      await setDoc(doc(db, "RecentSongs", user.uid), { songs: [] });
+      await setDoc(doc(db, "SavedSongs", user.uid), { songs: [] });
 
-      // Firestore: RecentSongs collection
-      const recentSongsRef = doc(db, "RecentSongs", user.uid);
-      await setDoc(recentSongsRef, { songs: [] });
-
-      // Firestore: SavedSongs collection
-      const savedSongsRef = doc(db, "SavedSongs", user.uid);
-      await setDoc(savedSongsRef, { songs: [] });
-
-      // Redirect to home
       navigate("/home");
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
-        setErrorMessage(
-          "This email is already registered. Please log in or use a different email.",
-        );
+        setErrorMessage("This email is already registered. Please log in or use a different email.");
       } else {
         setErrorMessage(error.message);
       }
-
-      // Optional cleanup: Delete auth user if Firestore failed
-      if (auth.currentUser && !auth.currentUser.emailVerified) {
-        await auth.currentUser.delete(); // Clean up incomplete accounts
-      }
+      // cleanup if needed...
     } finally {
       setIsLoading(false);
     }
@@ -90,31 +62,14 @@ const SignUp = () => {
   const handleGoogleSignUp = async () => {
     setIsLoading(true);
     try {
-      // Google OAuth
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      const profilePictureUrl = user.photoURL || "";
-
-      // Firestore: Users collection
-      const userRef = doc(db, "Users", user.uid);
-      await setDoc(userRef, {
+      await setDoc(doc(db, "Users", user.uid), {
         email: user.email,
-        profilePicture: profilePictureUrl,
+        profilePicture: user.photoURL || ""
       });
-
-      // Firestore: RecentSongs collection
-      const recentSongsRef = doc(db, "RecentSongs", user.uid);
-      await setDoc(recentSongsRef, {
-        songs: [],
-      });
-
-      // Firestore: SavedSongs collection
-      const savedSongsRef = doc(db, "SavedSongs", user.uid);
-      await setDoc(savedSongsRef, {
-        songs: [],
-      });
-
-      // Redirect home
+      await setDoc(doc(db, "RecentSongs", user.uid), { songs: [] });
+      await setDoc(doc(db, "SavedSongs", user.uid), { songs: [] });
       navigate("/home");
     } catch (error) {
       setErrorMessage(error.message);
@@ -124,101 +79,93 @@ const SignUp = () => {
   };
 
   return (
-    <div className="h-screen w-screen bg-white flex items-center justify-center relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-gradient-to-r from-purple-300 via-blue-200 to-cyan-300 opacity-40 rounded-full blur-3xl animate-blob"></div>
-      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-gradient-to-r from-emerald-200 via-teal-300 to-cyan-200 opacity-40 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
+    <div className="h-screen w-screen bg-gray-900 text-white flex items-center justify-center relative overflow-hidden">
+      {/* Background Blobs */}
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-gradient-to-r from-purple-700 via-blue-900 to-cyan-700 opacity-30 rounded-full blur-3xl animate-blob" />
+      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-gradient-to-r from-indigo-800 via-purple-700 to-pink-700 opacity-25 rounded-full blur-3xl animate-blob animation-delay-2000" />
 
-      <div className="w-full max-w-4xl bg-gradient-to-b from-silver to-gray-100 p-10 rounded-2xl shadow-2xl border border-gray-300 mx-auto relative overflow-hidden">
-        <h1 className="text-5xl font-extrabold text-center mb-8 bg-clip-text text-transparent bg-black">
+      {/* Card */}
+      <div className="w-full max-w-md bg-gradient-to-b from-gray-800 to-gray-900 p-10 rounded-2xl shadow-2xl border border-gray-700 mx-auto relative overflow-hidden">
+        <h1 className="text-4xl font-extrabold text-center mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500">
           Create an Account
         </h1>
-        <p className="text-center text-gray-600 mb-8">Sign up to join us</p>
+        <p className="text-center text-gray-400 mb-8">Sign up to join us</p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Email Field */}
+          {/* Email */}
           <div className="relative group">
-            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-gray-600 transition-all" />
+            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-gray-200 transition-colors" />
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all text-lg placeholder:text-gray-400 font-bold text-black"
+              onChange={e => setEmail(e.target.value)}
               placeholder="Enter your email"
               required
+              className="w-full pl-12 pr-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder-gray-500 text-white transition-colors"
             />
           </div>
 
-          {/* Password Field */}
+          {/* Password */}
           <div className="relative group">
-            <KeySquare className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-gray-600 transition-all" />
+            <KeySquare className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-gray-200 transition-colors" />
             <input
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all text-lg placeholder:text-gray-400 font-bold text-black"
+              onChange={e => setPassword(e.target.value)}
               placeholder="Enter your password"
               required
+              className="w-full pl-12 pr-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder-gray-500 text-white transition-colors"
             />
           </div>
 
-          {/* Profile Picture Upload Field */}
-          <div className="relative">
-            <label className="block text-gray-600 mb-2">
-              Upload Profile Picture (Optional)
-            </label>
+          {/* Profile Picture */}
+          <div>
+            <label className="block text-gray-400 mb-2">Profile Picture (optional)</label>
             <input
               type="file"
               accept="image/*"
-              onChange={(e) => setProfilePicture(e.target.files[0])}
-              className="block w-full text-sm text-gray-600 border border-gray-300 rounded-lg cursor-pointer"
+              onChange={e => setProfilePicture(e.target.files[0])}
+              className="w-full text-gray-400 bg-gray-800 border border-gray-600 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
 
-          {/* Error Message */}
           {errorMessage && (
-            <p className="text-red-500 text-center mb-4">{errorMessage}</p>
+            <p className="text-red-400 text-center">{errorMessage}</p>
           )}
 
+          {/* Sign Up Button */}
           <button
             type="submit"
-            className={`w-full py-3 px-4 ${
-              isLoading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-gray-300 hover:bg-gradient-to-r hover:from-blue-300 hover:to-blue-400"
-            } text-white rounded-lg transform transition-all duration-300 ease-in-out 
-            hover:scale-105 hover:shadow-xl font-semibold text-lg`}
             disabled={isLoading}
+            className={`w-full py-3 text-lg font-semibold rounded-lg shadow-lg transform transition-all duration-300 ${
+              isLoading
+                ? "bg-gray-600 cursor-not-allowed"
+                : "bg-purple-600 hover:bg-purple-700 hover:scale-105"
+            }`}
           >
             {isLoading ? "Signing Up..." : "Sign Up"}
           </button>
 
-          {/* Google Sign-Up Button */}
-          <div className="relative">
-            <button
-              type="button"
-              onClick={handleGoogleSignUp}
-              className="group w-full py-3 px-4 bg-blue-400 text-white rounded-lg flex items-center justify-center gap-3 border border-blue-400 hover:bg-blue-400 hover:shadow-lg transform transition-all duration-300 ease-in-out 
-    hover:bg-gradient-to-r hover:from-blue-300 hover:to-blue-400 hover:scale-105 font-semibold text-lg"
-            >
-              {/* Replace with a direct URL or properly import assets */}
-              <img
-                src="https://www.google.com/favicon.ico" // Replace with your Google icon
-                alt="Google Logo"
-                className="h-6 w-6 group-hover:animate-spin transition-transform"
-              />
-              <span>Continue with Google</span>
-            </button>
-          </div>
+          {/* Google */}
+          <button
+            type="button"
+            onClick={handleGoogleSignUp}
+            disabled={isLoading}
+            className="group w-full py-3 text-lg font-semibold bg-green-500 hover:bg-green-600 rounded-lg flex items-center justify-center gap-3 shadow-lg transform transition-all duration-300 hover:scale-105"
+          >
+            <img
+              src="https://www.google.com/favicon.ico"
+              alt="Google"
+              className="h-6 w-6 group-hover:animate-spin transition-transform"
+            />
+            <span>Continue with Google</span>
+          </button>
         </form>
 
-        <div className="mt-8 text-center text-sm text-gray-600">
-          <a href="#" className="text-gray-700 hover:text-gray-500">
-            Forgot password?
-          </a>
+        <div className="mt-8 text-center text-sm text-gray-500">
+          <a href="#" className="hover:text-gray-300">Forgot password?</a>
           <span className="mx-2">•</span>
-          <a href="#" className="text-gray-700 hover:text-gray-500">
-            Already have an account? Sign In
-          </a>
+          <a href="#" className="hover:text-gray-300">Already have an account? Log In</a>
         </div>
       </div>
     </div>
