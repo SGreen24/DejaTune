@@ -1,0 +1,114 @@
+.generate-tunes-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    background: var(--surface);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: system-ui, sans-serif;
+  }
+  
+  .title {
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    text-align: center;
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-group label {
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+  
+  .input,
+  .select {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    background: var(--input-bg);
+    font-size: 1rem;
+    transition: border-color 0.2s;
+  }
+  
+  .input:focus,
+  .select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  
+  .small-input {
+    width: 4rem;
+  }
+  
+  .artists-group .artist-input-row {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .add-btn {
+    background: var(--accent);
+    color: white;
+    padding: 0 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .add-btn:hover {
+    background: var(--accent-hover);
+  }
+  
+  .artists-list {
+    margin-top: 0.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .artist-chip {
+    background: var(--surface);
+    color: var(--text-secondary);
+    padding: 0.25rem 0.75rem;
+    border-radius: 2rem;
+    font-size: 0.875rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .error-text {
+    color: #e02424;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  .btn {
+    display: inline-block;
+    font-weight: 600;
+    text-align: center;
+  }
+  
+  .generate-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background: #22c55e;
+    color: white;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .generate-btn:hover {
+    background: #16a34a;
+  }
+  
+  .generate-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }

@@ -425,7 +425,7 @@ body {
 .verse-preview {
   font-size: 14px;
   line-height: 1.4;
-  max-height: 60px;
+  max-height: 60px; 
   overflow: hidden;
   text-overflow: ellipsis;
 }

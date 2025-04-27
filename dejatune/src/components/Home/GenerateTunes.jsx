@@ -1,9 +1,8 @@
-// src/pages/GenerateTunes.jsx
-
 import React, { useState } from "react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { auth, db } from "../../config/firebase";
 import { doc, updateDoc, arrayUnion } from "firebase/firestore";
+import './GenerateTunes.css';
 
 export default function GenerateTunes({ onDone }) {
   const user = auth.currentUser;
@@ -121,97 +120,91 @@ PREFERENCES:
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md space-y-4">
-      <h2 className="text-xl font-bold">Generate Tunes</h2>
+    <div className="generate-tunes-container">
+      <h2 className="title">Generate Tunes</h2>
 
-      <div className="space-y-4">
-        <label className="block">
-          Genre
-          <input
-            type="text"
-            value={genre}
-            onChange={(e) => setGenre(e.target.value)}
-            placeholder="e.g. Hip-Hop, Rock"
-            className="w-full mt-1 p-2 border rounded"
-          />
-        </label>
-
-        <label className="block">
-          Era
-          <select
-            value={era}
-            onChange={(e) => setEra(e.target.value)}
-            className="w-full mt-1 p-2 border rounded"
-          >
-            <option>1950s</option>
-            <option>1960s</option>
-            <option>1970s</option>
-            <option>1980s</option>
-            <option>1990s</option>
-            <option>2000s</option>
-            <option>2010s</option>
-            <option>2020s</option>
-          </select>
-        </label>
-
-        <label className="block">
-          Vibe
-          <input
-            type="text"
-            value={vibe}
-            onChange={(e) => setVibe(e.target.value)}
-            placeholder="e.g. Chill, Energetic"
-            className="w-full mt-1 p-2 border rounded"
-          />
-        </label>
-
-        <div>
-          <p className="mb-1">Favorite artists</p>
-          <div className="flex space-x-2">
-            <input
-              type="text"
-              value={artistInput}
-              onChange={(e) => setArtistInput(e.target.value)}
-              placeholder="Artist name"
-              className="flex-1 p-2 border rounded"
-            />
-            <button
-              type="button"
-              onClick={addArtist}
-              className="px-4 py-2 bg-blue-600 text-white rounded"
-            >
-              Add Artist
-            </button>
-          </div>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {artists.map((a, i) => (
-              <span key={i} className="text-sm px-2 py-1 bg-gray-200 rounded-full">
-                {a}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        <label className="block">
-          Number of songs
-          <input
-            type="number"
-            min={1}
-            max={20}
-            value={numSongs}
-            onChange={(e) => setNumSongs(Number(e.target.value))}
-            className="w-24 mt-1 p-2 border rounded"
-          />
-        </label>
+      <div className="form-group">
+        <label>Genre</label>
+        <input
+          type="text"
+          value={genre}
+          onChange={(e) => setGenre(e.target.value)}
+          placeholder="e.g. Hip-Hop, Rock"
+          className="input"
+        />
       </div>
 
-      {error && <p className="text-red-600">{error}</p>}
+      <div className="form-group">
+        <label>Era</label>
+        <select
+          value={era}
+          onChange={(e) => setEra(e.target.value)}
+          className="select"
+        >
+          <option>1950s</option>
+          <option>1960s</option>
+          <option>1970s</option>
+          <option>1980s</option>
+          <option>1990s</option>
+          <option>2000s</option>
+          <option>2010s</option>
+          <option>2020s</option>
+        </select>
+      </div>
+
+      <div className="form-group">
+        <label>Vibe</label>
+        <input
+          type="text"
+          value={vibe}
+          onChange={(e) => setVibe(e.target.value)}
+          placeholder="e.g. Chill, Energetic"
+          className="input"
+        />
+      </div>
+
+      <div className="form-group artists-group">
+        <label>Favorite artists</label>
+        <div className="artist-input-row">
+          <input
+            type="text"
+            value={artistInput}
+            onChange={(e) => setArtistInput(e.target.value)}
+            placeholder="Artist name"
+            className="input"
+          />
+          <button type="button" onClick={addArtist} className="btn add-btn">
+            Add
+          </button>
+        </div>
+        <div className="artists-list">
+          {artists.map((a, i) => (
+            <span key={i} className="artist-chip">
+              {a}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="form-group">
+        <label>Number of songs</label>
+        <input
+          type="number"
+          min={1}
+          max={20}
+          value={numSongs}
+          onChange={(e) => setNumSongs(Number(e.target.value))}
+          className="input small-input"
+        />
+      </div>
+
+      {error && <p className="error-text">{error}</p>}
 
       <button
         type="button"
         onClick={handleGenerate}
         disabled={loading}
-        className="w-full py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+        className="btn generate-btn"
       >
         {loading ? "Generating…" : "Generate"}
       </button>

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { Check, X } from "lucide-react";
+import { Check, X, Play, Pause } from "lucide-react";
 import { auth, db } from "../../config/firebase";
 import Profile from "./Profile";
 import Think from "./Think";
 import Deja from "./Deja";
 import GenerateTunes from "./GenerateTunes";
-
+import "./Home.css"
 import {
   doc,
   onSnapshot,
@@ -21,6 +21,7 @@ const Home = () => {
   const [user, setUser] = useState(null);
   const [recentSongs, setRecentSongs] = useState([]);
   const [savedSongs, setSavedSongs] = useState([]);
+  const [currentlyPlaying, setCurrentlyPlaying] = useState(null);
 
   // UI state
   const [phrases, setPhrases] = useState([""]);
@@ -40,8 +41,13 @@ const Home = () => {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [overview, setOverview] = useState("");
+  const [funFact, setFunFact] = useState("");
   const [bgColor, setBgColor] = useState("var(--bg-color)");
   const [quoteTextColor, setQuoteTextColor] = useState("#000");
+  const [showOverviewDropdown, setShowOverviewDropdown] = useState(false);
+const [showFunFactDropdown, setShowFunFactDropdown] = useState(false);
+
 
   // Gemini + Spotify setup
   const apiKey = import.meta.env.VITE_GEMINI_KEY;
@@ -50,6 +56,54 @@ const Home = () => {
 
   const ai = new GoogleGenerativeAI(apiKey);
   const model = ai.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+  // NEW: fetch Overview & Fun Fact
+  async function fetchSongExtras(song, artist) {
+    const prompt = `
+You are a music expert. For the song "${song}" by ${artist}, output ONLY valid JSON:
+{
+  "overview": "A brief summary of the song's background and style.",
+  "funFact": "An interesting trivia tidbit about the song."
+}`;
+    const raw = await (await model.generateContent(prompt)).response.text();
+    const json = raw.replace(/```json|```/g, "").trim();
+    return JSON.parse(json);
+  }
+
+  // NEW: when clicking a saved song
+  async function handleSavedClick(item) {
+    setLoading(true);
+    setError(null);
+    try {
+      // fetch album + metadata
+      const details = await fetchSpotifyDetails(item.song, item.artist);
+
+      // fetch Gemini extras
+      const extras = await fetchSongExtras(item.song, item.artist);
+
+      setResult({
+        song: item.song,
+        artist: item.artist,
+        ...details
+      });
+      setOverview(extras.overview);
+      setFunFact(extras.funFact);
+    } catch (e) {
+      setError(e.message || "Failed to load song details.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Toggle play/pause for songs
+  const togglePlay = (spotifyId) => {
+    if (currentlyPlaying === spotifyId) {
+      setCurrentlyPlaying(null);
+    } else {
+      setCurrentlyPlaying(spotifyId);
+    }
+  };
+
   // Listen for auth state
   useEffect(() => {
     const unsub = auth.onAuthStateChanged((u) => {
@@ -78,6 +132,30 @@ const Home = () => {
     };
   }, [user]);
 
+
+    // Dynamic background based on album cover
+    useEffect(() => {
+      if (!result?.albumImage) return;
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = result.albumImage;
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = img.width; canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        const { data } = ctx.getImageData(0, 0, img.width, img.height);
+        let r=0,g=0,b=0,cnt=0;
+        for(let i=0;i<data.length;i+=4){
+          r+=data[i]; g+=data[i+1]; b+=data[i+2]; cnt++;
+        }
+        r=Math.round(r/cnt); g=Math.round(g/cnt); b=Math.round(b/cnt);
+        setBgColor(`rgb(${r},${g},${b})`);
+        const lum=(r*299+g*587+b*114)/1000;
+        setQuoteTextColor(lum<128?"#FFF":"#000");
+      };
+    }, [result?.albumImage]);
+
   // delete handlers
   const deleteSavedSong = async (songObj) => {
     if (!user) return;
@@ -85,11 +163,13 @@ const Home = () => {
     await updateDoc(savedRef, { songs: arrayRemove(songObj) });
   };
 
+  
+
   const deleteRecentSong = async (songObj) => {
     if (!user) return;
     const recentRef = doc(db, "RecentSongs", user.uid);
     await updateDoc(recentRef, { songs: arrayRemove(songObj) });
-  };
+  }
 
   // Form prompt builder
   const buildFormPrompt = () =>
@@ -364,8 +444,9 @@ ${history}
             <div className="space-y-2">
               {savedSongs.map((t, i) => (
                 <div
-                  key={`saved-${i}`}
-                  className="group flex items-center space-x-3 hover:bg-blue-700 px-2 py-1 rounded cursor-pointer"
+                key={i}
+                className="group flex items-center space-x-3 hover:bg-blue-700 px-2 py-1 rounded cursor-pointer"
+                onClick={() => handleSavedClick(t)}
                 >
                   {t.albumImage && (
                     <img
@@ -434,140 +515,141 @@ ${history}
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="main-content flex-1" style={{ backgroundColor: bgColor }}>
-        {showGenerate ? (
-          <GenerateTunes onDone={() => setShowGenerate(false)} />
-        ) : (
-          <>
-            {!showForm && !showChat && !result && (
-              <div className="think-view">
-                <button className="think-btn" onClick={() => setShowForm(true)}>
-                  Think!
-                </button>
-                <h2 className="dejatune-title">DéjáTune</h2>
-              </div>
-            )}
+  {showGenerate ? (
+    <GenerateTunes onDone={() => setShowGenerate(false)} />
+  ) : result ? (
+    <div className="music-widget p-6">
+      {/* Cover Art */}
+      <img
+        src={result.albumImage}
+        alt={result.song}
+        className="music-widget__cover"
+      />
 
-            {showForm && !showChat && !result && (
-              <Think
-                phrases={phrases}
-                setPhrases={setPhrases}
-                genre={genre}
-                setGenre={setGenre}
-                year={year}
-                setYear={setYear}
-                tone={tone}
-                setTone={setTone}
-                vibe={vibe}
-                setVibe={setVibe}
-                identifySong={identifySong}
-                loading={loading}
-                error={error}
-              />
-            )}
+      {/* Details & Controls */}
+      <div className="music-widget__details">
+        {/* Title / Artist Header */}
+        <div className="music-widget__header">
+          <div>
+            <h2 className="music-widget__title">{result.song}</h2>
+            <p className="music-widget__artist">{result.artist}</p>
+          </div>
+          {/* (Optional) your little preview + “+” button here */}
+        </div>
 
-            {showChat && !result && (
-              <Deja
-                conversation={conversation}
-                currentQuestion={currentQuestion}
-                options={options}
-                inputValue={inputValue}
-                setInputValue={setInputValue}
-                handleSendInitial={handleSendInitial}
-                handleOption={handleOption}
-                loading={loading}
-                error={error}
-              />
-            )}
-
-            {result && (
-              <div className="result-view">
-                <img
-                  src={result.albumImage}
-                  alt="Album cover"
-                  className="cover-thumb"
-                />
-                <div className="quote-panel">
-                  <h1 className="result-song">{result.song}</h1>
-                  <h2 className="result-artist">{result.artist}</h2>
-                  <div className="result-meta">
-                    <span>{result.albumName}</span>
-                    <span>{result.releaseDate}</span>
-                  </div>
-                  {result.verse && (
-                    <div
-                      className="lyrics-container"
-                      style={{
-                        margin: "1rem 0",
-                        padding: "1rem",
-                        backgroundColor: "rgba(255,255,255,0.1)",
-                        borderRadius: "8px",
-                        color: quoteTextColor,
-                        fontStyle: "italic",
-                        position: "relative",
-                        lineHeight: "1.6",
-                      }}
-                    >
-                      <div
-                        style={{
-                          position: "absolute",
-                          left: "0.5rem",
-                          top: "-0.5rem",
-                          fontSize: "2rem",
-                          color: quoteTextColor,
-                          opacity: 0.7,
-                        }}
-                      >
-                        "
-                      </div>
-                      <div
-                        dangerouslySetInnerHTML={{
-                          __html: result.verse.replace(
-                            /\*\*(.*?)\*\*/g,
-                            "<b><i>$1</i></b>"
-                          ),
-                        }}
-                      />
-                      <div
-                        style={{
-                          position: "absolute",
-                          right: "0.5rem",
-                          bottom: "-1rem",
-                          fontSize: "2rem",
-                          color: quoteTextColor,
-                          opacity: 0.7,
-                        }}
-                      >
-                        "
-                      </div>
-                    </div>
-                  )}
-                  {result.spotifyId && (
-                    <iframe
-                      title="Spotify preview"
-                      src={`https://open.spotify.com/embed/track/${result.spotifyId}`}
-                      width="100%"
-                      height="80"
-                      frameBorder="0"
-                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                      loading="lazy"
-                    />
-                  )}
-                  <div className="accept-reject">
-                    <button onClick={onAccept}>
-                      <Check size={32} />
-                    </button>
-                    <button onClick={onReject}>
-                      <X size={32} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </>
+        {/* Lyrics Quote */}
+        {result.verse && (
+          <blockquote
+            className="mt-6 p-4 italic rounded-lg"
+            style={{ color: quoteTextColor, background: "rgba(255,255,255,0.1)" }}
+            dangerouslySetInnerHTML={{
+              __html: result.verse.replace(/\*\*(.*?)\*\*/g, "<b><i>$1</i></b>"),
+            }}
+          />
         )}
-      </main>
+
+        {/* Overview / Fun Fact Buttons */}
+        <div className="music-widget__info-buttons">
+          <div>
+            <button
+              onClick={() => setShowOverviewDropdown(!showOverviewDropdown)}
+              className="music-widget__button"
+            >
+              Overview
+            </button>
+            {showOverviewDropdown && (
+              <div className="music-widget__dropdown">{overview}</div>
+            )}
+          </div>
+          <div>
+            <button
+              onClick={() => setShowFunFactDropdown(!showFunFactDropdown)}
+              className="music-widget__button"
+            >
+              Fun Fact
+            </button>
+            {showFunFactDropdown && (
+              <div className="music-widget__dropdown">{funFact}</div>
+            )}
+          </div>
+        </div>
+
+        {/* Spotify Embed */}
+        {result.spotifyId && (
+          <div className="music-widget__spotify">
+            <iframe
+              title="Spotify preview"
+              src={`https://open.spotify.com/embed/track/${result.spotifyId}`}
+              allow="autoplay; encrypted-media"
+              loading="lazy"
+            />
+          </div>
+        )}
+
+        {/* ACCEPT / REJECT ROW */}
+        <div className="accept-reject">
+          <button onClick={onAccept}>
+            <Check size={28} />
+          </button>
+          <button onClick={onReject}>
+            <X size={28} />
+          </button>
+          </div>     
+      </div>
+    </div>
+  ) : (
+    <>
+      {/* initial “Think!” landing */}
+      {!showForm && !showChat && !result && (
+        <div className="think-view">
+          <button className="think-btn" onClick={() => setShowForm(true)}>
+            Think!
+          </button>
+          <h2 className="dejatune-title">DéjáTune</h2>
+        </div>
+      )}
+
+      {/* Think form */}
+      {showForm && !showChat && !result && (
+        <Think
+          phrases={phrases}
+          setPhrases={setPhrases}
+          genre={genre}
+          setGenre={setGenre}
+          year={year}
+          setYear={setYear}
+          tone={tone}
+          setTone={setTone}
+          vibe={vibe}
+          setVibe={setVibe}
+          identifySong={identifySong}
+          loading={loading}
+          error={error}
+        />
+      )}
+
+      {/* Chat w/ Déjà */}
+      {showChat && !result && (
+        <Deja
+          conversation={conversation}
+          currentQuestion={currentQuestion}
+          options={options}
+          inputValue={inputValue}
+          setInputValue={setInputValue}
+          handleSendInitial={handleSendInitial}
+          handleOption={handleOption}
+          loading={loading}
+          error={error}
+        />
+      )}
+    </>
+  )}
+</main>
+
+
+
+
 
       {/* Right Sidebar */}
       <aside className="right-sidebar flex flex-col items-end space-y-4 p-4">
