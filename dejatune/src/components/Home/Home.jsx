@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { Check, X, Play, Pause } from "lucide-react";
+import { Check, X, Play, Pause, Disc3 } from "lucide-react";
 import { auth, db } from "../../config/firebase";
 import Profile from "./Profile";
 import Think from "./Think";
@@ -530,6 +530,14 @@ ${history}
     background: result ? bgColor : "linear-gradient(to bottom, #1f2937, #111827)"
   }}
 >
+  {/* Déjà Tune Logo */}
+  {!showGenerate && !showForm && !showChat && !result && (
+    <div className="flex justify-center mt-8">
+      <h1 className="text-5xl font-extrabold text-white drop-shadow-lg">
+      Déjà Tune
+      </h1>
+    </div>
+  )}
   {showGenerate ? (
     <GenerateTunes onDone={() => setShowGenerate(false)} />
   ) : result ? (
@@ -652,13 +660,13 @@ ${history}
     <>
       {/* initial “Think!” landing */}
       {!showForm && !showChat && !result && (
-        <div className="think-view">
-          <button className="think-btn" onClick={() => setShowForm(true)}>
-            Think!
-          </button>
-          <h2 className="dejatune-title">DéjáTune</h2>
-        </div>
-      )}
+  <div className="think-view flex flex-col items-center justify-start mt-10 space-y-10">
+    <button className="think-btn" onClick={() => setShowForm(true)}>
+      Think!
+    </button>
+  </div>
+)}
+
 
       {/* Think form */}
       {showForm && !showChat && !result && (
@@ -703,7 +711,10 @@ ${history}
 
       {/* Right Sidebar */}
 <aside className="right-sidebar flex flex-col items-end space-y-4 p-4 bg-gradient-to-b from-gray-900 to-gray-800 border-l border-gray-700">
+<div className="flex items-center space-x-4 mb-4">
   <Profile />
+  <Disc3 className="h-12 w-12 text-white" />
+</div>
 
   {!showChat && !showGenerate && (
     <>

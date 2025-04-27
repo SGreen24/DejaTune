@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { LogIn, BadgePlus, User } from 'lucide-react';
+import { LogIn, BadgePlus, User, Disc3 } from 'lucide-react';
 import { useEffect } from 'react';
 
 const App = () => {
@@ -36,6 +36,13 @@ const App = () => {
 
       {/* Main Container */}
       <div className="w-full max-w-4xl bg-gradient-to-b from-gray-900 to-gray-800 p-10 rounded-2xl shadow-2xl border border-gray-700 mx-auto relative overflow-hidden">
+
+        {/* Disc Icon */}
+<div className="flex justify-center mb-4">
+  <Disc3 className="h-30 w-30 text-white animate-spin-slow" />
+</div>
+
+
         {/* Title Section */}
         <h1 className="text-5xl font-extrabold text-center mb-8 text-white">
           Déjà Tune
