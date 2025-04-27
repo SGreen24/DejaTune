@@ -1,5 +1,3 @@
-// src/pages/Home.jsx
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -10,7 +8,13 @@ import Think from "./Think";
 import Deja from "./Deja";
 import GenerateTunes from "./GenerateTunes";
 
-import { doc, onSnapshot, updateDoc, arrayUnion } from "firebase/firestore";
+import {
+  doc,
+  onSnapshot,
+  updateDoc,
+  arrayUnion,
+  arrayRemove
+} from "firebase/firestore";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -73,6 +77,19 @@ const Home = () => {
       unsubSaved();
     };
   }, [user]);
+
+  // delete handlers
+  const deleteSavedSong = async (songObj) => {
+    if (!user) return;
+    const savedRef = doc(db, "SavedSongs", user.uid);
+    await updateDoc(savedRef, { songs: arrayRemove(songObj) });
+  };
+
+  const deleteRecentSong = async (songObj) => {
+    if (!user) return;
+    const recentRef = doc(db, "RecentSongs", user.uid);
+    await updateDoc(recentRef, { songs: arrayRemove(songObj) });
+  };
 
   // Form prompt builder
   const buildFormPrompt = () =>
@@ -365,6 +382,15 @@ ${history}
                       {t.artist}
                     </p>
                   </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteSavedSong(t);
+                    }}
+                    className="opacity-0 group-hover:opacity-100 ml-2"
+                  >
+                    <X size={16} />
+                  </button>
                 </div>
               ))}
             </div>
@@ -394,6 +420,15 @@ ${history}
                   {t.artist}
                 </p>
               </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteRecentSong(t);
+                }}
+                className="opacity-0 group-hover:opacity-100 ml-2"
+              >
+                <X size={16} />
+              </button>
             </div>
           ))}
         </div>
