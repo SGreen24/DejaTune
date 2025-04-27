@@ -1,4 +1,3 @@
-// src/pages/Login.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, KeySquare } from 'lucide-react';
@@ -14,8 +13,8 @@ const provider = new GoogleAuthProvider();
 
 const Login = () => {
   const navigate = useNavigate();
-  const [email, setEmail]           = useState('');
-  const [password, setPassword]     = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
   const ensureUserCollections = async (uid) => {
@@ -78,23 +77,23 @@ const Login = () => {
   };
 
   return (
-    <div className="h-screen w-screen bg-white flex items-center justify-center relative overflow-hidden">
+    <div className="h-screen w-screen bg-black text-white flex items-center justify-center relative overflow-hidden">
       {/* Background Lights */}
       <div className="absolute top-0 left-0 w-[500px] h-[500px]
-                      bg-gradient-to-r from-purple-300 via-blue-200 to-cyan-300
-                      opacity-40 rounded-full blur-3xl animate-blob" />
+                      bg-gradient-to-r from-purple-700 via-blue-900 to-cyan-700
+                      opacity-30 rounded-full blur-3xl animate-blob" />
       <div className="absolute bottom-0 right-0 w-[400px] h-[400px]
-                      bg-gradient-to-r from-emerald-200 via-teal-300 to-cyan-200
-                      opacity-40 rounded-full blur-3xl animate-blob animation-delay-2000" />
+                      bg-gradient-to-r from-indigo-800 via-purple-700 to-pink-700
+                      opacity-25 rounded-full blur-3xl animate-blob animation-delay-2000" />
 
       {/* Card */}
-      <div className="w-full max-w-md bg-gradient-to-b from-gray-100 to-gray-200
-                      p-10 rounded-2xl shadow-2xl border border-gray-300
+      <div className="w-full max-w-md bg-gradient-to-b from-gray-900 to-gray-800
+                      p-10 rounded-2xl shadow-2xl border border-gray-700
                       mx-auto relative overflow-hidden">
-        <h1 className="text-4xl font-extrabold text-center mb-6 text-gray-800">
+        <h1 className="text-4xl font-extrabold text-center mb-6 text-white">
           Log In
         </h1>
-        <p className="text-center text-gray-600 mb-8">Welcome Back!</p>
+        <p className="text-center text-gray-400 mb-8">Welcome Back!</p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="relative">
@@ -105,9 +104,9 @@ const Login = () => {
               onChange={e => setEmail(e.target.value)}
               placeholder="Enter your email"
               required
-              className="w-full pl-12 pr-4 py-3 bg-white border border-gray-300 rounded-lg
+              className="w-full pl-12 pr-4 py-3 bg-gray-800 border border-gray-600 rounded-lg
                          focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400
-                         text-gray-700 transition-colors"
+                         text-white transition-colors"
             />
           </div>
 
@@ -119,14 +118,14 @@ const Login = () => {
               onChange={e => setPassword(e.target.value)}
               placeholder="Enter your password"
               required
-              className="w-full pl-12 pr-4 py-3 bg-white border border-gray-300 rounded-lg
+              className="w-full pl-12 pr-4 py-3 bg-gray-800 border border-gray-600 rounded-lg
                          focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400
-                         text-gray-700 transition-colors"
+                         text-white transition-colors"
             />
           </div>
 
           {errorMessage && (
-            <p className="text-red-600 text-center">{errorMessage}</p>
+            <p className="text-red-500 text-center">{errorMessage}</p>
           )}
 
           {/* Primary Log In Button */}
@@ -158,10 +157,10 @@ const Login = () => {
           </button>
         </form>
 
-        <div className="mt-8 text-center text-sm text-gray-600">
-          <a href="#" className="hover:text-gray-800">Forgot password?</a>
+        <div className="mt-8 text-center text-sm text-gray-400">
+          <a href="#" className="hover:text-white">Forgot password?</a>
           <span className="mx-2">•</span>
-          <a href="#" className="hover:text-gray-800">Don’t have an account? Sign Up</a>
+          <a href="#" className="hover:text-white">Don’t have an account? Sign Up</a>
         </div>
       </div>
     </div>

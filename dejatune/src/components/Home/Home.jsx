@@ -407,7 +407,19 @@ ${history}
     }
     clearAll();
   };
-  const onReject = () => (result ? clearAll() : handleOption("No"));
+  const onReject = async () => {
+    if (user && result) {
+      const recentRef = doc(db, "RecentSongs", user.uid);
+      await updateDoc(recentRef, {
+        songs: arrayRemove({
+          song: result.song,
+          artist: result.artist,
+          timestamp: result.timestamp || new Date().toISOString(), // safeguard
+        }),
+      });
+    }
+    clearAll();
+  };
 
   const clearAll = () => {
     setShowForm(false);
@@ -436,9 +448,9 @@ ${history}
   };
 
   return (
-    <div className="app-container flex">
+    <div className="app-container flex bg-black text-white">
       {/* Left Sidebar */}
-      <aside className="left-sidebar p-4 bg-white text-black w-64">
+      <aside className="left-sidebar p-4 bg-gradient-to-b from-gray-900 to-gray-800 border-r border-gray-700 w-64 overflow-y-auto">
         {savedSongs.length > 0 && (
           <>
             <h2 className="text-lg font-bold mb-2">Accepted Thoughts</h2>
@@ -446,34 +458,30 @@ ${history}
               {savedSongs.map((t, i) => (
                 <div
                 key={i}
-                className="group flex items-center space-x-3 hover:bg-blue-700 px-2 py-1 rounded cursor-pointer"
+                className="group flex items-center space-x-3 hover:bg-blue-800 px-3 py-2 rounded-lg cursor-pointer transition-all duration-200"
                 onClick={() => handleSavedClick(t)}
-                >
-                  {t.albumImage && (
-                    <img
-                      src={t.albumImage}
-                      alt={`${t.song} cover`}
-                      className="w-10 h-10 rounded-sm object-cover"
-                    />
-                  )}
-                  <div className="flex-1 truncate">
-                    <p className="text-sm font-medium truncate group-hover:text-white">
-                      {t.song}
-                    </p>
-                    <p className="text-xs text-gray-600 truncate group-hover:text-white">
-                      {t.artist}
-                    </p>
-                  </div>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteSavedSong(t);
-                    }}
-                    className="opacity-0 group-hover:opacity-100 ml-2"
-                  >
-                    <X size={16} />
-                  </button>
+              >
+                {t.albumImage && (
+                  <img
+                    src={t.albumImage}
+                    alt={`${t.song} cover`}
+                    className="w-10 h-10 rounded object-cover"
+                  />
+                )}
+                <div className="flex-1 truncate">
+                  <p className="text-sm font-semibold truncate group-hover:text-white">{t.song}</p>
+                  <p className="text-xs text-gray-400 truncate group-hover:text-gray-200">{t.artist}</p>
                 </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteSavedSong(t);
+                  }}
+                  className="opacity-0 group-hover:opacity-100 ml-2 text-gray-400 hover:text-red-500 transition"
+                >
+                  <X size={16} />
+                </button>
+              </div>
               ))}
             </div>
             <hr className="border-gray-300 my-4" />
@@ -516,11 +524,21 @@ ${history}
         </div>
       </aside>
 
-      <main className="main-content flex-1" style={{ backgroundColor: bgColor }}>
+      <main
+  className="main-content flex-1 overflow-y-auto"
+  style={{
+    background: result ? bgColor : "linear-gradient(to bottom, #1f2937, #111827)"
+  }}
+>
   {showGenerate ? (
     <GenerateTunes onDone={() => setShowGenerate(false)} />
   ) : result ? (
-    <div className="music-widget p-6">
+    <div
+  className="music-widget p-6"
+  style={{
+    background: result ? bgColor : "rgba(17, 24, 39, 0.8)"
+  }}
+>
       {/* Cover Art */}
       <img
         src={result.albumImage}
@@ -684,51 +702,43 @@ ${history}
 
 
       {/* Right Sidebar */}
-      <aside className="right-sidebar flex flex-col items-end space-y-4 p-4">
-        <Profile />
+<aside className="right-sidebar flex flex-col items-end space-y-4 p-4 bg-gradient-to-b from-gray-900 to-gray-800 border-l border-gray-700">
+  <Profile />
 
-        {!showChat && !showGenerate && (
-          <button
-            className="chat-deja mb-2"
-            onClick={() => {
-              clearAll();
-              setShowChat(true);
-            }}
-          >
-            Chat w/ Déjà
-          </button>
-        )}
-        {showChat && !showGenerate && (
-          <button
-            className="chat-deja mb-2"
-            onClick={() => {
-              clearAll();
-              setShowForm(true);
-            }}
-          >
-            Think w/ Form
-          </button>
-        )}
+  {!showChat && !showGenerate && (
+    <>
+      <button
+        className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 rounded-lg transition-all duration-300 text-white font-semibold"
+        onClick={() => { clearAll(); setShowChat(true); }}
+      >
+        Chat w/ Déjà
+      </button>
 
-        {!showGenerate ? (
-          <button
-            className="generate-tunes bg-purple-600 text-white px-4 py-2 rounded"
-            onClick={() => {
-              clearAll();
-              setShowGenerate(true);
-            }}
-          >
-            Generate Tunes
-          </button>
-        ) : (
-          <button
-            className="generate-tunes bg-gray-500 text-white px-4 py-2 rounded"
-            onClick={() => setShowGenerate(false)}
-          >
-            Close Generator
-          </button>
-        )}
-      </aside>
+      <button
+        className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-all duration-300 text-white font-semibold"
+        onClick={() => { clearAll(); setShowForm(true); }}
+      >
+        Think w/ Form
+      </button>
+    </>
+  )}
+
+  {!showGenerate ? (
+    <button
+      className="w-full py-3 px-4 bg-purple-600 hover:bg-purple-700 rounded-lg transition-all duration-300 text-white font-semibold"
+      onClick={() => { clearAll(); setShowGenerate(true); }}
+    >
+      Generate Tunes
+    </button>
+  ) : (
+    <button
+      className="w-full py-3 px-4 bg-gray-600 hover:bg-gray-700 rounded-lg transition-all duration-300 text-white font-semibold"
+      onClick={() => setShowGenerate(false)}
+    >
+      Close Generator
+    </button>
+  )}
+</aside>
     </div>
   );
 };

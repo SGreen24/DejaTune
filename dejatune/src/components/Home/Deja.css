@@ -1,112 +1,170 @@
+/* Deja.css */
+
 .chat-container {
-    max-width: 700px;
-    margin: 2rem auto;
-    font-family: system-ui, sans-serif;
-  }
-  
-  .chat-bubble {
-    padding: 0.75rem 1rem;
-    border-radius: 1rem;
-    margin: 0.5rem 0;
-    max-width: 80%;
-  }
-  .chat-bubble.user {
-    background: #0070f3;
-    color: white;
-    align-self: flex-end;
-  }
-  .chat-bubble.bot {
-    background: #e5e5ea;
-    color: #000;
-    align-self: flex-start;
-  }
-  
-  .instructions {
-    text-align: center;
-    margin-bottom: 1rem;
-    color: #555;
-  }
-  .loading   { text-align: center; color: #888; }
-  .error     { text-align: center; color: red; }
-  
-  .manual-input,
-  .initial-input {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 1rem;
-  }
-  .manual-input input,
-  .initial-input input {
-    flex: 1;
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 0.375rem;
-  }
-  .manual-input button,
-  .initial-input button {
-    padding: 0.5rem 1rem;
-    border: none;
-    background: #0070f3;
-    color: white;
-    border-radius: 0.375rem;
-    cursor: pointer;
-  }
-  
-  .options-row {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 1rem;
-    flex-wrap: wrap;
-  }
-  .option-btn {
-    flex: 1;
-    min-width: 80px;
-    padding: 0.5rem;
-    border: none;
-    background: #f0f0f0;
-    border-radius: 0.375rem;
-    cursor: pointer;
-  }
-  
-  .song-result-card {
-    background: white;
-    border-radius: 0.5rem;
-    padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
-  .song-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-  .cover-thumb {
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
-    border-radius: 0.5rem;
-  }
-  .song-meta .song-title {
-    font-size: 1.75rem;
-    margin: 0;
-  }
-  .song-meta .song-artist {
-    color: #555;
-    margin: 0.25rem 0;
-  }
-  .song-meta .song-album {
-    font-size: 0.875rem;
-    color: #777;
-  }
-  
-  .accept-reject {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    margin-top: 1.5rem;
-  }
-  .accept-reject button {
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-  
+  background: linear-gradient(to bottom, #111827, #1f2937);
+  color: #f9fafb;
+  padding: 2rem;
+  border-radius: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Chat bubbles */
+.chat-bubble {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 1rem;
+  max-width: 80%;
+  word-break: break-word;
+}
+
+.chat-bubble.user {
+  background: #1e40af; /* dark blue */
+  align-self: flex-end;
+  color: white;
+}
+
+.chat-bubble.bot {
+  background: #374151; /* dark gray */
+  align-self: flex-start;
+  color: white;
+}
+
+/* Input fields */
+.initial-input,
+.manual-input {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.initial-input input,
+.manual-input input {
+  flex: 1;
+  padding: 0.75rem;
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 0.5rem;
+  color: #f9fafb;
+}
+
+.initial-input button,
+.manual-input button {
+  padding: 0.75rem 1.5rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.initial-input button:hover,
+.manual-input button:hover {
+  background: #2563eb;
+}
+
+/* Options (Yes/No/Unsure) */
+.options-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  justify-content: center;
+}
+
+.option-btn {
+  padding: 0.75rem 1.5rem;
+  background: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.option-btn:hover {
+  background: #4b5563;
+}
+
+/* Song result card */
+.song-result-card {
+  background: rgba(17, 24, 39, 0.8);
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  text-align: center;
+}
+
+.song-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cover-thumb {
+  width: 80px;
+  height: 80px;
+  border-radius: 0.5rem;
+  object-fit: cover;
+}
+
+.song-meta {
+  text-align: left;
+}
+
+.song-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #f9fafb;
+}
+
+.song-artist, .song-album {
+  font-size: 0.9rem;
+  color: #9ca3af;
+}
+
+/* Accept / Reject buttons */
+.accept-reject {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.accept-reject button {
+  background: rgba(255,255,255,0.1);
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.accept-reject button:hover {
+  background: #3b82f6;
+  transform: scale(1.1);
+}
+
+/* Loading / Error */
+.loading,
+.error {
+  text-align: center;
+  margin-top: 2rem;
+  font-weight: bold;
+  color: #ffffff; /* Red for errors */
+}

@@ -1,4 +1,3 @@
-// src/pages/SignUp.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, KeySquare } from "lucide-react";
@@ -8,11 +7,11 @@ import { doc, setDoc } from "firebase/firestore";
 
 const SignUp = () => {
   const navigate = useNavigate();
-  const [email, setEmail]               = useState("");
-  const [password, setPassword]         = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [profilePicture, setProfilePicture] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
-  const [isLoading, setIsLoading]       = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleProfilePictureUpload = () => {
     if (!profilePicture) return Promise.resolve(null);
@@ -78,17 +77,17 @@ const SignUp = () => {
   };
 
   return (
-    <div className="h-screen w-screen bg-white flex items-center justify-center relative overflow-hidden">
+    <div className="h-screen w-screen bg-black text-white flex items-center justify-center relative overflow-hidden">
       {/* Background Lights */}
-      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-gradient-to-r from-purple-300 via-blue-200 to-cyan-300 opacity-40 rounded-full blur-3xl animate-blob" />
-      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-gradient-to-r from-emerald-200 via-teal-300 to-cyan-200 opacity-40 rounded-full blur-3xl animate-blob animation-delay-2000" />
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-gradient-to-r from-purple-700 via-blue-900 to-cyan-700 opacity-30 rounded-full blur-3xl animate-blob" />
+      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-gradient-to-r from-indigo-800 via-purple-700 to-pink-700 opacity-25 rounded-full blur-3xl animate-blob animation-delay-2000" />
 
       {/* Card */}
-      <div className="w-full max-w-md bg-gradient-to-b from-gray-100 to-gray-200 p-10 rounded-2xl shadow-2xl border border-gray-300 mx-auto relative overflow-hidden">
-        <h1 className="text-4xl font-extrabold text-center mb-6 text-gray-800">
+      <div className="w-full max-w-md bg-gradient-to-b from-gray-900 to-gray-800 p-10 rounded-2xl shadow-2xl border border-gray-700 mx-auto relative overflow-hidden">
+        <h1 className="text-4xl font-extrabold text-center mb-6 text-white">
           Create an Account
         </h1>
-        <p className="text-center text-gray-600 mb-8">Sign up to join us</p>
+        <p className="text-center text-gray-400 mb-8">Sign up to join us</p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Email */}
@@ -100,9 +99,9 @@ const SignUp = () => {
               onChange={e => setEmail(e.target.value)}
               placeholder="Enter your email"
               required
-              className="w-full pl-12 pr-4 py-3 bg-white border border-gray-300 rounded-lg
+              className="w-full pl-12 pr-4 py-3 bg-gray-800 border border-gray-600 rounded-lg
                          focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400
-                         text-gray-700 transition-colors"
+                         text-white transition-colors"
             />
           </div>
 
@@ -115,26 +114,26 @@ const SignUp = () => {
               onChange={e => setPassword(e.target.value)}
               placeholder="Enter your password"
               required
-              className="w-full pl-12 pr-4 py-3 bg-white border border-gray-300 rounded-lg
+              className="w-full pl-12 pr-4 py-3 bg-gray-800 border border-gray-600 rounded-lg
                          focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400
-                         text-gray-700 transition-colors"
+                         text-white transition-colors"
             />
           </div>
 
           {/* Profile Picture */}
           <div>
-            <label className="block text-gray-700 mb-2">Profile Picture (optional)</label>
+            <label className="block text-gray-400 mb-2">Profile Picture (optional)</label>
             <input
               type="file"
               accept="image/*"
               onChange={e => setProfilePicture(e.target.files[0])}
-              className="w-full text-gray-700 bg-white border border-gray-300 rounded-lg
+              className="w-full text-white bg-gray-800 border border-gray-600 rounded-lg
                          cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           {errorMessage && (
-            <p className="text-red-600 text-center">{errorMessage}</p>
+            <p className="text-red-500 text-center">{errorMessage}</p>
           )}
 
           {/* Sign Up Button */}
@@ -143,7 +142,7 @@ const SignUp = () => {
             disabled={isLoading}
             className={`w-full py-3 text-lg font-semibold rounded-lg shadow-lg transform transition-all duration-300
                        ${isLoading
-                         ? "bg-gray-300 cursor-not-allowed text-gray-500"
+                         ? "bg-gray-700 cursor-not-allowed text-gray-400"
                          : "bg-blue-100 text-blue-600 border border-blue-200 hover:bg-blue-200 hover:scale-105 hover:shadow-blue-300/50"
                        }`}
           >
@@ -157,7 +156,7 @@ const SignUp = () => {
             disabled={isLoading}
             className={`group w-full py-3 text-lg font-semibold rounded-lg shadow-lg flex items-center justify-center gap-3 transform transition-all duration-300
                        ${isLoading
-                         ? "bg-gray-300 cursor-not-allowed text-gray-500"
+                         ? "bg-gray-700 cursor-not-allowed text-gray-400"
                          : "bg-emerald-100 text-emerald-600 border border-emerald-200 hover:bg-emerald-200 hover:scale-105 hover:shadow-emerald-300/50"
                        }`}
           >
@@ -170,10 +169,10 @@ const SignUp = () => {
           </button>
         </form>
 
-        <div className="mt-8 text-center text-sm text-gray-600">
-          <a href="#" className="hover:text-gray-800">Forgot password?</a>
+        <div className="mt-8 text-center text-sm text-gray-400">
+          <a href="#" className="hover:text-white">Forgot password?</a>
           <span className="mx-2">•</span>
-          <a href="#" className="hover:text-gray-800">Already have an account? Log In</a>
+          <a href="#" className="hover:text-white">Already have an account? Log In</a>
         </div>
       </div>
     </div>

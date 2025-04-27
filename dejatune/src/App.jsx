@@ -10,7 +10,6 @@ const App = () => {
   const spotifyClientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
   const spotifySecretId = import.meta.env.VITE_SPOTIFY_SECRET_ID;
 
-  // Example usage: fetch something with Gemini key
   useEffect(() => {
     const fetchGeminiData = async () => {
       try {
@@ -30,15 +29,15 @@ const App = () => {
   const handleGuest = () => navigate('/guest');
 
   return (
-    <div className="h-screen w-screen bg-white flex items-center justify-center relative overflow-hidden">
+    <div className="h-screen w-screen bg-black text-white flex items-center justify-center relative overflow-hidden">
       {/* Background Lights */}
-      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-gradient-to-r from-purple-300 via-blue-200 to-cyan-300 opacity-40 rounded-full blur-3xl animate-blob"></div>
-      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-gradient-to-r from-emerald-200 via-teal-300 to-cyan-200 opacity-40 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-gradient-to-r from-purple-700 via-blue-900 to-cyan-700 opacity-30 rounded-full blur-3xl animate-blob"></div>
+      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-gradient-to-r from-indigo-800 via-purple-700 to-pink-700 opacity-25 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
 
       {/* Main Container */}
-      <div className="w-full max-w-4xl bg-gradient-to-b from-gray-100 to-gray-200 p-10 rounded-2xl shadow-2xl border border-gray-300 mx-auto relative overflow-hidden">
+      <div className="w-full max-w-4xl bg-gradient-to-b from-gray-900 to-gray-800 p-10 rounded-2xl shadow-2xl border border-gray-700 mx-auto relative overflow-hidden">
         {/* Title Section */}
-        <h1 className="text-5xl font-extrabold text-center mb-8 text-gray-800">
+        <h1 className="text-5xl font-extrabold text-center mb-8 text-white">
           Déjà Tune
         </h1>
 
@@ -76,8 +75,8 @@ const App = () => {
         </div>
 
         {/* Footer Section (Optional Content) */}
-        <div className="mt-10 text-center text-sm text-gray-600 relative z-10">
-          {/* Add footer text if needed */}
+        <div className="mt-10 text-center text-sm text-gray-400 relative z-10">
+          {/* Optional footer */}
         </div>
       </div>
     </div>
