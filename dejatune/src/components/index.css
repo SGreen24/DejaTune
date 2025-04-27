@@ -1,5 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 @import "tailwindcss";
-/* Theme Vars (PS5-style) */
 :root {
   --bg-color: #F2F2F2;
   --surface: #FFFFFF;
@@ -17,7 +17,7 @@ body {
   margin: 0;
   background: var(--bg-color);
   color: var(--text-primary);
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Poppins', system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 .app-container {
   display: flex;

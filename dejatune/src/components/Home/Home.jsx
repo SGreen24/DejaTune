@@ -29,6 +29,7 @@ const Home = () => {
   const [year, setYear] = useState("");
   const [tone, setTone] = useState("");
   const [vibe, setVibe] = useState("");
+  const [showSongDetailsDropdown, setShowSongDetailsDropdown] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [showGenerate, setShowGenerate] = useState(false);
@@ -549,31 +550,62 @@ ${history}
           />
         )}
 
-        {/* Overview / Fun Fact Buttons */}
-        <div className="music-widget__info-buttons">
-          <div>
-            <button
-              onClick={() => setShowOverviewDropdown(!showOverviewDropdown)}
-              className="music-widget__button"
-            >
-              Overview
-            </button>
-            {showOverviewDropdown && (
-              <div className="music-widget__dropdown">{overview}</div>
-            )}
-          </div>
-          <div>
-            <button
-              onClick={() => setShowFunFactDropdown(!showFunFactDropdown)}
-              className="music-widget__button"
-            >
-              Fun Fact
-            </button>
-            {showFunFactDropdown && (
-              <div className="music-widget__dropdown">{funFact}</div>
-            )}
-          </div>
-        </div>
+<div className="music-widget__info-buttons flex space-x-4 mt-4">
+  {/* Overview Button */}
+  <div className="relative">
+    <button
+      onClick={() => {
+        setShowOverviewDropdown(!showOverviewDropdown);
+        setShowFunFactDropdown(false);
+        setShowSongDetailsDropdown(false);
+      }}
+      className="music-widget__button"
+    >
+      Overview
+    </button>
+    {showOverviewDropdown && (
+      <div className="music-widget__dropdown">{overview}</div>
+    )}
+  </div>
+
+  {/* Fun Fact Button */}
+  <div className="relative">
+    <button
+      onClick={() => {
+        setShowFunFactDropdown(!showFunFactDropdown);
+        setShowOverviewDropdown(false);
+        setShowSongDetailsDropdown(false);
+      }}
+      className="music-widget__button"
+    >
+      Fun Fact
+    </button>
+    {showFunFactDropdown && (
+      <div className="music-widget__dropdown">{funFact}</div>
+    )}
+  </div>
+
+  {/* NEW: Song Details Button */}
+  <div className="relative">
+    <button
+      onClick={() => {
+        setShowSongDetailsDropdown(!showSongDetailsDropdown);
+        setShowOverviewDropdown(false);
+        setShowFunFactDropdown(false);
+      }}
+      className="music-widget__button"
+    >
+      Song Details
+    </button>
+    {showSongDetailsDropdown && result && (
+      <div className="music-widget__dropdown space-y-2 text-sm">
+        <p><b>Song:</b> {result.song}</p>
+        <p><b>Album:</b> {result.albumName || "Unknown Album"}</p>
+        <p><b>Year:</b> {result.releaseDate ? result.releaseDate.split("-")[0] : "Unknown"}</p>
+      </div>
+    )}
+  </div>
+</div>
 
         {/* Spotify Embed */}
         {result.spotifyId && (

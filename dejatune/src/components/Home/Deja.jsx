@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Check, X } from 'lucide-react';
 import './Deja.css';
+import { auth, db } from "../../config/firebase";
+import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 
 const apiKey = "AIzaSyCh75P7FsxwekKc8XoXvnVm62hrBKyplQQ";
 const spotifyClientId = "0cce2105ad6d4048b1de873a05a8844e";
@@ -177,6 +179,30 @@ ${Array.from(askedQuestions).join('\n')}
     generateNextQuestion(ans);
   };
 
+  const acceptSong = async () => {
+    if (!songResult) return;
+    try {
+      const user = auth.currentUser;
+      if (!user) throw new Error("User not logged in.");
+  
+      const savedRef = doc(db, "SavedSongs", user.uid);
+      await updateDoc(savedRef, {
+        songs: arrayUnion({
+          song: songResult.title,
+          artist: songResult.artist,
+          albumName: songResult.album,
+          releaseDate: songResult.releaseDate,
+          spotifyId: songResult.spotifyId,
+          albumImage: songResult.coverUrl,
+          timestamp: new Date().toISOString()
+        }),
+      });
+      resetAll();
+    } catch (error) {
+      console.error("Failed to save accepted song:", error.message);
+    }
+  };
+
   // reset all state
   const resetAll = () => {
     setConversation([]);
@@ -212,7 +238,7 @@ ${Array.from(askedQuestions).join('\n')}
             loading="lazy"
           />
           <div className="accept-reject">
-            <button onClick={() => {/* TODO: add to accepted */ resetAll(); }}>
+          <button onClick={acceptSong}>
               <Check size={32}/>
             </button>
             <button onClick={resetAll}>
