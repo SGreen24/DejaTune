@@ -29,6 +29,46 @@ Ever had to relive a stuck music melody stored in your mind like Dejavu? Welcome
 - Database: Firebase Firestore
 - Build Tool: Vite
 
+## API Setup
+
+### Spotify API
+1. Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+2. Create a new application
+3. Get your Client ID and Client Secret
+4. Add `http://localhost:5173` to your Redirect URIs
+
+### Firebase API
+1. Go to [Firebase Console](https://console.firebase.google.com)
+2. Create a new project
+3. Enable Authentication and Firestore
+4. Get your Firebase configuration details
+
+### Gemini API
+1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Create a new API key
+3. Enable the Gemini API in your Google Cloud Console
+
+## Environment Variables
+Create a `.env` file in the root directory with the following variables:
+
+```env
+# Spotify API
+VITE_SPOTIFY_CLIENT_ID=your_spotify_client_id
+VITE_SPOTIFY_SECRET_ID=your_spotify_secret_id
+
+# Firebase API
+VITE_FIREBASE_API_KEY=your_firebase_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+VITE_FIREBASE_PROJECT_ID=your_firebase_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
+VITE_FIREBASE_APP_ID=your_firebase_app_id
+VITE_FIREBASE_MEASUREMENT_ID=your_firebase_measurement_id
+
+# Gemini API
+VITE_GEMINI_KEY=your_gemini_api_key
+```
+
 ## Deployment
 
 ### Local Development
