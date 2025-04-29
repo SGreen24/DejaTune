@@ -1,0 +1,291 @@
+/* Home.css */
+
+/* Container layout */
+.app-container {
+  display: flex;
+  height: 100vh;
+  background: #000; /* Black background */
+}
+
+/* Left sidebar */
+.left-sidebar {
+  width: 240px;
+  background: linear-gradient(to bottom, #1f2937, #111827); /* Dark gradient */
+  padding: 1rem;
+  border-right: 1px solid #374151; /* Dark border */
+  overflow-y: auto;
+}
+
+.left-sidebar h2 {
+  margin-bottom: 0.5rem;
+  color: #e5e7eb; /* Light text */
+  font-size: 1.125rem;
+}
+
+.left-sidebar .group {
+  transition: background 0.2s;
+}
+
+.left-sidebar .group:hover {
+  background: #1e40af; /* Dark blue hover */
+}
+
+/* Main content area */
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  position: relative;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Result view */
+.result-view {
+  max-width: 800px;
+  width: 100%;
+  text-align: center;
+}
+
+.cover-thumb {
+  width: 320px;
+  height: 320px;
+  object-fit: cover;
+  border-radius: 1rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  margin: 0 auto;
+}
+
+.result-view h1,
+.result-view h2,
+.result-view .text-center {
+  color: #f9fafb; /* Light text */
+}
+
+/* Lyrics quote */
+.result-view blockquote {
+  border-left: 4px solid #3b82f6; /* Accent */
+  background: rgba(255,255,255,0.05);
+  margin: 1.5rem auto;
+  padding: 1rem;
+  max-width: 700px;
+  font-style: italic;
+  color: #e5e7eb;
+}
+
+/* Info buttons */
+.info-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.info-buttons button {
+  padding: 1rem 2rem;
+  background: rgba(255,255,255,0.05);
+  border: 2px solid #3b82f6;
+  border-radius: 1rem;
+  font-size: 1.125rem;
+  color: #e5e7eb;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.info-buttons button:hover {
+  background: #3b82f6;
+  color: white;
+}
+
+/* Dropdown panels */
+.dropdown {
+  margin-top: 0.5rem;
+  padding: 1rem;
+  background: rgba(17,24,39,0.8);
+  border-radius: 0.5rem;
+  color: #f9fafb;
+}
+
+/* Spotify widget wrapper */
+.spotify-widget {
+  width: 100%;
+  max-width: 800px;
+  margin: 2rem auto 0;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+.spotify-widget iframe {
+  width: 100%;
+  height: 80px;
+  border: none;
+}
+
+/* Right sidebar */
+.right-sidebar {
+  width: 200px;
+  padding: 1rem;
+  background: linear-gradient(to bottom, #1f2937, #111827);
+  border-left: 1px solid #374151;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.right-sidebar button {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  color: white;
+  font-weight: 600;
+}
+
+/* Special Buttons */
+.sign-out-btn {
+  background: #dc2626; /* Red */
+}
+
+.chat-deja {
+  background: #3b82f6; /* Accent blue */
+}
+
+.generate-tunes {
+  background: #8b5cf6; /* Purple */
+}
+
+/* Music widget */
+.music-widget {
+  display: flex;
+  flex-direction: column;
+  max-width: 800px;
+  width: 100%;
+  background: rgba(17, 24, 39, 0.8);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .music-widget {
+    flex-direction: row;
+  }
+}
+
+.music-widget__cover {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+  .music-widget__cover {
+    margin-right: 1.5rem;
+    margin-bottom: 0;
+  }
+}
+
+.music-widget__details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.music-widget__header h2,
+.music-widget__header p,
+.music-widget__meta {
+  margin: 0;
+  color: #fff;
+}
+
+.music-widget__title {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.music-widget__artist {
+  font-size: 1.25rem;
+  opacity: 0.85;
+  margin-top: 0.25rem;
+}
+
+.music-widget__meta {
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  opacity: 0.7;
+}
+
+.music-widget__info-buttons {
+  display: flex;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.music-widget__button {
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  border-radius: 0.5rem;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.music-widget__button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.music-widget__dropdown {
+  margin-top: 0.5rem;
+  padding: 1rem;
+  background: rgba(17,24,39,0.8);
+  border-radius: 0.5rem;
+  color: #f9fafb;
+}
+
+.music-widget__spotify {
+  margin-top: auto;
+}
+
+.music-widget__spotify iframe {
+  width: 100%;
+  height: 80px;
+  border: none;
+  border-radius: 0.5rem;
+}
+
+/* Accept / Reject buttons */
+.accept-reject {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.accept-reject button {
+  width: 3rem;
+  height: 3rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.accept-reject button:hover {
+  background: #3b82f6; /* Accent hover */
+  transform: scale(1.1);
+}
+
+.accept-reject button svg {
+  color: #fff;
+}

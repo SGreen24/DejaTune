@@ -1,0 +1,118 @@
+/* GenerateTunes Dark Mode */
+
+.generate-tunes-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  background: linear-gradient(to bottom, #111827, #1f2937);
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  font-family: system-ui, sans-serif;
+  color: #f9fafb;
+}
+
+.title {
+  font-size: 1.75rem;
+  margin-bottom: 1.5rem;
+  color: #f9fafb;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 0.5rem;
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+.input,
+.select {
+  padding: 0.75rem 1rem;
+  border: 1px solid #374151;
+  border-radius: 0.5rem;
+  background: #1f2937;
+  font-size: 1rem;
+  color: #f9fafb;
+  transition: border-color 0.2s;
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.small-input {
+  width: 4rem;
+}
+
+.artists-group .artist-input-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.add-btn {
+  background: #3b82f6;
+  color: white;
+  padding: 0 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.add-btn:hover {
+  background: #2563eb;
+}
+
+.artists-list {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.artist-chip {
+  background: #374151;
+  color: #d1d5db;
+  padding: 0.25rem 0.75rem;
+  border-radius: 2rem;
+  font-size: 0.875rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.error-text {
+  color: #f87171;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.btn {
+  display: inline-block;
+  font-weight: 600;
+  text-align: center;
+}
+
+.generate-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: #22c55e;
+  color: white;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.generate-btn:hover {
+  background: #16a34a;
+}
+
+.generate-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
