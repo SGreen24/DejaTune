@@ -5,9 +5,9 @@ import './Deja.css';
 import { auth, db } from "../../config/firebase";
 import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 
-const apiKey = "AIzaSyCh75P7FsxwekKc8XoXvnVm62hrBKyplQQ";
-const spotifyClientId = "0cce2105ad6d4048b1de873a05a8844e";
-const spotifyClientSecret = "ef9aa9eb23c04ed7b852918b36c6e486";
+const apiKey = import.meta.env.VITE_GEMINI_KEY;
+const spotifyClientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
+const spotifyClientSecret = import.meta.env.VITE_SPOTIFY_SECRET_ID;
 
 const Deja = () => {
   const aiRef = useRef(null);

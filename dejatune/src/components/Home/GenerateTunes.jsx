@@ -8,9 +8,9 @@ export default function GenerateTunes({ onDone }) {
   const user = auth.currentUser;
 
   // Gemini + Spotify setup
-  const apiKey = "AIzaSyCh75P7FsxwekKc8XoXvnVm62hrBKyplQQ";
-  const [spotifyClientId] = useState("ffbb278d0ef74b07887f0643f073a745");
-  const [spotifyClientSecret] = useState("64f2d31922fb401eab8325c800637ab7");
+  const apiKey = import.meta.env.VITE_GEMINI_KEY;
+  const [spotifyClientId] = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
+  const [spotifyClientSecret] = import.meta.env.VITE_SPOTIFY_SECRET_ID;
   const ai = new GoogleGenerativeAI(apiKey);
   const model = ai.getGenerativeModel({ model: "gemini-2.0-flash" });
 

@@ -4,14 +4,15 @@ import { getAnalytics } from "firebase/analytics";
 import { getAuth, GoogleAuthProvider, EmailAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
+
 const firebaseConfig = {
-  apiKey: "AIzaSyBmbem6OOR4SZRLCAmqHe9aF_zH6h3dyvQ",
-  authDomain: "dejatune-bacb9.firebaseapp.com",
-  projectId: "dejatune-bacb9",
-  storageBucket: "dejatune-bacb9.appspot.com",
-  messagingSenderId: "743128467537",
-  appId: "1:743128467537:web:8b848364a3761584b29070",
-  measurementId: "G-GR08K4ETGX"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize
