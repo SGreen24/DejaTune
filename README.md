@@ -6,3 +6,10 @@
 - lucide-react
 - npm install firebase
 - npm install @google/generative-ai
+
+
+
+## To run the app
+- cd dejatune
+- npm install
+- npm run dev
