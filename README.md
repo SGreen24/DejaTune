@@ -13,3 +13,4 @@
 - cd dejatune
 - npm install
 - npm run dev
+- enjoy
