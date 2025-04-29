@@ -58,5 +58,5 @@ dist-ssr
 *.sln
 *.sw?
 
-# My keys
+# Environment variables
 .env
